@@ -25,6 +25,41 @@ model User {
   updatedAt    DateTime          @updatedAt
 }
 
+model BrandSettings {
+  id                String   @id @default("default")
+  organizationName  String
+  shortName         String
+  appTitle          String
+  appDescription    String
+  appEyebrow        String
+  appSummary        String
+  loginBadge        String
+  loginTitle        String
+  loginDescription  String
+  loginSupportTitle String
+  loginSupportText  String
+  background        String
+  panelBackground   String
+  panelBorder       String
+  mutedSurface      String
+  primary           String
+  primaryHover      String
+  secondary         String
+  accent            String
+  accentText        String
+  text              String
+  mutedText         String
+  inputBorder       String
+  inputFocus        String
+  inputDisabled     String
+  cardShadow        String
+  logoText          String
+  loginImageUrl     String?
+  logoImageUrl      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
 model Process {
   id          String      @id @default(cuid())
   name        String      @unique
