@@ -93,6 +93,10 @@ const indicatorTemplates = [
 ];
 
 async function main() {
+  await prisma.user.deleteMany({
+    where: { email: "visor@indicadores.local" },
+  });
+
   await prisma.user.upsert({
     where: { email: "admin@indicadores.local" },
     update: {
@@ -205,3 +209,4 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+
