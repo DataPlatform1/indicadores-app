@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 import { canSubmit, canViewHistory } from "@/lib/roles";
 
 const SESSION_COOKIE_NAME = "indicadores_session";
@@ -81,8 +82,33 @@ export function readSessionToken(token: string | undefined) {
 export async function getCurrentSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+  const payload = readSessionToken(token);
 
-  return readSessionToken(token);
+  if (!payload) {
+    return null;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: payload.userId },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      name: true,
+      isActive: true,
+    },
+  });
+
+  if (!user || !user.isActive) {
+    return null;
+  }
+
+  return {
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    name: user.name,
+  };
 }
 
 export { canSubmit, canViewHistory };
@@ -90,3 +116,4 @@ export { canSubmit, canViewHistory };
 export function sessionCookieName() {
   return SESSION_COOKIE_NAME;
 }
+
