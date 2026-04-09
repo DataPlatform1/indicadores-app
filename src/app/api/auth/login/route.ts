@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
   if (!body.email || !body.password) {
     return NextResponse.json(
-      { message: "Debes ingresar correo y contraseña." },
+      { message: "Debes ingresar correo y contrasena." },
       { status: 400 },
     );
   }
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   if (!user || !verifyPassword(body.password, user.passwordHash)) {
     return NextResponse.json(
-      { message: "Las credenciales no son válidas." },
+      { message: "Las credenciales no son validas." },
       { status: 401 },
     );
   }
@@ -46,22 +46,22 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  response.cookies.set(sessionCookieName(), createSessionToken({
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-    name: user.name,
-  }), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-  });
-
-  return response;
-}
-
+  response.cookies.set(
+    sessionCookieName(),
+    createSessionToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+    }),
+    {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    },
+  );
 
   return response;
 }
