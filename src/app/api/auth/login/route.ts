@@ -30,6 +30,13 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (!user.isActive) {
+    return NextResponse.json(
+      { message: "Tu usuario se encuentra inactivo. Contacta al administrador." },
+      { status: 403 },
+    );
+  }
+
   const response = NextResponse.json({
     user: {
       id: user.id,
@@ -51,6 +58,10 @@ export async function POST(request: NextRequest) {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
+
+  return response;
+}
+
 
   return response;
 }
