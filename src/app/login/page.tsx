@@ -95,7 +95,7 @@ export default function LoginPage() {
       <div className="mx-auto grid min-h-[80vh] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-[2rem] border border-white/70 bg-white/85 p-8 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur">
           <p className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-semibold text-teal-900">
-            Acceso al sistema
+            Acceso al sistema actualizado
           </p>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950">
             Inicia sesion para diligenciar el formulario de indicadores
