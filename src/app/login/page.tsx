@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { BRANDING } from "@/lib/branding";
 import { canSubmit } from "@/lib/roles";
 
 type SessionUser = {
@@ -91,23 +92,52 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#dff4ff_0%,#f7fbff_45%,#eef4e8_100%)] px-4 py-8 text-slate-900">
+    <main className="brand-page px-4 py-8">
       <div className="mx-auto grid min-h-[80vh] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="rounded-[2rem] border border-white/70 bg-white/85 p-8 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur">
-          <p className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-semibold text-teal-900">
-            Acceso al sistema actualizado
-          </p>
-          <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950">
-            Inicia sesion para acceder el formulario de indicadores
+        <section className="brand-panel rounded-[2rem] p-8">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="brand-logo-mark">
+              {BRANDING.assets.logoText || BRANDING.shortName}
+            </span>
+            <div className="space-y-1">
+              <p className="brand-kicker">{BRANDING.appEyebrow}</p>
+              <p className="text-sm font-semibold text-slate-700">
+                {BRANDING.organizationName}
+              </p>
+            </div>
+          </div>
+
+          <p className="brand-badge mt-6">{BRANDING.loginBadge}</p>
+          <h1 className="brand-title mt-5 max-w-3xl text-4xl font-semibold tracking-tight">
+            {BRANDING.loginTitle}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-            Esta pantalla esta separada del formulario para que el acceso sea mas claro y profesional.
+          <p className="brand-copy mt-4 max-w-2xl text-base leading-7">
+            {BRANDING.loginDescription}
           </p>
+
+          <div className="brand-panel-soft mt-8 rounded-[1.75rem] p-6">
+            <p className="brand-kicker">{BRANDING.loginSupportTitle}</p>
+            <p className="brand-copy mt-3 text-sm leading-7">
+              {BRANDING.loginSupportText}
+            </p>
+            <div className="mt-5 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
+              <div className="rounded-[1.25rem] bg-white/80 p-4">
+                <p className="brand-kicker">Donde se cambia</p>
+                <p className="mt-2 font-semibold text-slate-900">src/lib/branding.ts</p>
+              </div>
+              <div className="rounded-[1.25rem] bg-white/80 p-4">
+                <p className="brand-kicker">Que controlas</p>
+                <p className="mt-2 font-semibold text-slate-900">
+                  colores, textos, tipografias y logo
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <section className="rounded-[2rem] border border-white/70 bg-white p-8 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
-          <h2 className="text-2xl font-semibold text-slate-950">Ingresar</h2>
-          <p className="mt-2 text-sm text-slate-500">
+        <section className="brand-panel rounded-[2rem] p-8">
+          <h2 className="brand-title text-2xl font-semibold">Ingresar</h2>
+          <p className="brand-copy mt-2 text-sm">
             Usa tu correo y contrasena para acceder.
           </p>
 
@@ -149,7 +179,7 @@ export default function LoginPage() {
             ) : null}
 
             <button
-              className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+              className="brand-button-primary px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:bg-slate-400"
               disabled={isLoggingIn}
               type="submit"
             >
