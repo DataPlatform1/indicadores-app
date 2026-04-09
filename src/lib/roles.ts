@@ -5,3 +5,7 @@ export function canSubmit(role: string | undefined) {
 export function canViewHistory(role: string | undefined) {
   return role === "ADMIN";
 }
+
+export function canManageUsers(role: string | undefined) {
+  return role === "ADMIN";
+}
