@@ -23,6 +23,7 @@ export default function LoginPage() {
         cache: "no-store",
         credentials: "include",
       });
+
       if (!response.ok) {
         return;
       }
@@ -68,7 +69,7 @@ export default function LoginPage() {
       };
 
       if (!response.ok || !payload.user) {
-        throw new Error(payload.message || "No fue posible iniciar sesión.");
+        throw new Error(payload.message || "No fue posible iniciar sesion.");
       }
 
       if (canSubmit(payload.user.role)) {
@@ -82,7 +83,7 @@ export default function LoginPage() {
       setLoginError(
         error instanceof Error
           ? error.message
-          : "Ocurrió un error al iniciar sesión.",
+          : "Ocurrio un error al iniciar sesion.",
       );
     } finally {
       setIsLoggingIn(false);
@@ -97,29 +98,17 @@ export default function LoginPage() {
             Acceso al sistema
           </p>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950">
-            Inicia sesión para diligenciar el formulario de indicadores
+            Inicia sesion para diligenciar el formulario de indicadores
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
-            Esta pantalla está separada del formulario para que el acceso sea
-            más claro y profesional.
+            Esta pantalla esta separada del formulario para que el acceso sea mas claro y profesional.
           </p>
-
-          <div className="mt-8 rounded-[1.5rem] bg-slate-950 p-6 text-slate-50">
-            <p className="text-sm uppercase tracking-[0.18em] text-cyan-300">
-              Usuarios de prueba
-            </p>
-            <div className="mt-4 grid gap-3 text-sm leading-6 text-slate-300">
-              <p>Admin: `admin@indicadores.local` / `Admin123*`</p>
-              <p>Editor: `editor@indicadores.local` / `Editor123*`</p>
-              <p>Viewer: `visor@indicadores.local` / `Viewer123*`</p>
-            </div>
-          </div>
         </section>
 
         <section className="rounded-[2rem] border border-white/70 bg-white p-8 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
           <h2 className="text-2xl font-semibold text-slate-950">Ingresar</h2>
           <p className="mt-2 text-sm text-slate-500">
-            Usa tu correo y contraseña para acceder.
+            Usa tu correo y contrasena para acceder.
           </p>
 
           <form className="mt-6 grid gap-4" onSubmit={handleLogin}>
@@ -140,7 +129,7 @@ export default function LoginPage() {
             </label>
 
             <label className="grid gap-2 text-sm font-medium text-slate-700">
-              <span>Contraseña</span>
+              <span>Contrasena</span>
               <input
                 className="field"
                 type="password"
@@ -164,7 +153,7 @@ export default function LoginPage() {
               disabled={isLoggingIn}
               type="submit"
             >
-              {isLoggingIn ? "Ingresando..." : "Iniciar sesión"}
+              {isLoggingIn ? "Ingresando..." : "Iniciar sesion"}
             </button>
           </form>
         </section>
