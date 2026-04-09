@@ -19,7 +19,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     async function loadSession() {
-      const response = await fetch("/api/auth/session");
+      const response = await fetch("/api/auth/session", {
+        cache: "no-store",
+        credentials: "include",
+      });
       if (!response.ok) {
         return;
       }
@@ -52,6 +55,7 @@ export default function LoginPage() {
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -68,11 +72,11 @@ export default function LoginPage() {
       }
 
       if (canSubmit(payload.user.role)) {
-        router.push("/formulario");
+        window.location.assign("/formulario");
         return;
       }
 
-      router.push("/sin-acceso");
+      window.location.assign("/sin-acceso");
     } catch (error) {
       console.error(error);
       setLoginError(
