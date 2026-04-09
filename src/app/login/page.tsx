@@ -12,13 +12,158 @@ type SessionUser = {
   name: string;
 };
 
+type BrandingViewModel = {
+  organizationName: string;
+  shortName: string;
+  appTitle: string;
+  appDescription: string;
+  appEyebrow: string;
+  appSummary: string;
+  loginBadge: string;
+  loginTitle: string;
+  loginDescription: string;
+  loginSupportTitle: string;
+  loginSupportText: string;
+  visualStyle: {
+    background: string;
+    panelBackground: string;
+    panelBorder: string;
+    mutedSurface: string;
+    primary: string;
+    primaryHover: string;
+    secondary: string;
+    accent: string;
+    accentText: string;
+    text: string;
+    mutedText: string;
+    inputBorder: string;
+    inputFocus: string;
+    inputDisabled: string;
+    cardShadow: string;
+  };
+  fonts: {
+    sansVar: string;
+    displayVar: string;
+    monoVar: string;
+  };
+  assets: {
+    logoText: string;
+    loginImageUrl: string;
+    logoImageUrl: string;
+  };
+};
+
+type BrandingPayload = {
+  settings?: {
+    organizationName?: string;
+    shortName?: string;
+    appTitle?: string;
+    appDescription?: string;
+    appEyebrow?: string;
+    appSummary?: string;
+    loginBadge?: string;
+    loginTitle?: string;
+    loginDescription?: string;
+    loginSupportTitle?: string;
+    loginSupportText?: string;
+    background?: string;
+    panelBackground?: string;
+    panelBorder?: string;
+    mutedSurface?: string;
+    primary?: string;
+    primaryHover?: string;
+    secondary?: string;
+    accent?: string;
+    accentText?: string;
+    text?: string;
+    mutedText?: string;
+    inputBorder?: string;
+    inputFocus?: string;
+    inputDisabled?: string;
+    cardShadow?: string;
+    logoText?: string;
+    loginImageUrl?: string | null;
+    logoImageUrl?: string | null;
+  } | null;
+};
+
+function mergeBranding(payload: BrandingPayload): BrandingViewModel {
+  const settings = payload.settings;
+
+  if (!settings) {
+    return BRANDING;
+  }
+
+  return {
+    organizationName: settings.organizationName || BRANDING.organizationName,
+    shortName: settings.shortName || BRANDING.shortName,
+    appTitle: settings.appTitle || BRANDING.appTitle,
+    appDescription: settings.appDescription || BRANDING.appDescription,
+    appEyebrow: settings.appEyebrow || BRANDING.appEyebrow,
+    appSummary: settings.appSummary || BRANDING.appSummary,
+    loginBadge: settings.loginBadge || BRANDING.loginBadge,
+    loginTitle: settings.loginTitle || BRANDING.loginTitle,
+    loginDescription: settings.loginDescription || BRANDING.loginDescription,
+    loginSupportTitle: settings.loginSupportTitle || BRANDING.loginSupportTitle,
+    loginSupportText: settings.loginSupportText || BRANDING.loginSupportText,
+    visualStyle: {
+      background: settings.background || BRANDING.visualStyle.background,
+      panelBackground:
+        settings.panelBackground || BRANDING.visualStyle.panelBackground,
+      panelBorder: settings.panelBorder || BRANDING.visualStyle.panelBorder,
+      mutedSurface: settings.mutedSurface || BRANDING.visualStyle.mutedSurface,
+      primary: settings.primary || BRANDING.visualStyle.primary,
+      primaryHover: settings.primaryHover || BRANDING.visualStyle.primaryHover,
+      secondary: settings.secondary || BRANDING.visualStyle.secondary,
+      accent: settings.accent || BRANDING.visualStyle.accent,
+      accentText: settings.accentText || BRANDING.visualStyle.accentText,
+      text: settings.text || BRANDING.visualStyle.text,
+      mutedText: settings.mutedText || BRANDING.visualStyle.mutedText,
+      inputBorder: settings.inputBorder || BRANDING.visualStyle.inputBorder,
+      inputFocus: settings.inputFocus || BRANDING.visualStyle.inputFocus,
+      inputDisabled:
+        settings.inputDisabled || BRANDING.visualStyle.inputDisabled,
+      cardShadow: settings.cardShadow || BRANDING.visualStyle.cardShadow,
+    },
+    fonts: BRANDING.fonts,
+    assets: {
+      logoText: settings.logoText || BRANDING.assets.logoText,
+      loginImageUrl: settings.loginImageUrl || BRANDING.assets.loginImageUrl,
+      logoImageUrl: settings.logoImageUrl || BRANDING.assets.logoImageUrl,
+    },
+  };
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [branding, setBranding] = useState<BrandingViewModel>({
+    ...BRANDING,
+    fonts: { ...BRANDING.fonts },
+    visualStyle: { ...BRANDING.visualStyle },
+    assets: { ...BRANDING.assets },
+  });
 
   useEffect(() => {
+    async function loadBranding() {
+      try {
+        const response = await fetch("/api/branding", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const payload = (await response.json()) as BrandingPayload;
+        setBranding(mergeBranding(payload));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     async function loadSession() {
       const response = await fetch("/api/auth/session", {
         cache: "no-store",
@@ -46,6 +191,7 @@ export default function LoginPage() {
       router.replace("/sin-acceso");
     }
 
+    loadBranding();
     loadSession();
   }, [router]);
 
@@ -96,42 +242,74 @@ export default function LoginPage() {
       <div className="mx-auto grid min-h-[80vh] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="brand-panel rounded-[2rem] p-8">
           <div className="flex flex-wrap items-center gap-4">
-            <span className="brand-logo-mark">
-              {BRANDING.assets.logoText || BRANDING.shortName}
-            </span>
+            {branding.assets.logoImageUrl ? (
+              <img
+                alt={`${branding.organizationName} logo`}
+                className="h-14 w-14 rounded-full object-cover shadow-[0_16px_32px_rgba(15,23,42,0.18)]"
+                src={branding.assets.logoImageUrl}
+              />
+            ) : (
+              <span className="brand-logo-mark">
+                {branding.assets.logoText || branding.shortName}
+              </span>
+            )}
             <div className="space-y-1">
-              <p className="brand-kicker">{BRANDING.appEyebrow}</p>
+              <p className="brand-kicker">{branding.appEyebrow}</p>
               <p className="text-sm font-semibold text-slate-700">
-                {BRANDING.organizationName}
+                {branding.organizationName}
               </p>
             </div>
           </div>
 
-          <p className="brand-badge mt-6">{BRANDING.loginBadge}</p>
+          <p className="brand-badge mt-6">{branding.loginBadge}</p>
           <h1 className="brand-title mt-5 max-w-3xl text-4xl font-semibold tracking-tight">
-            {BRANDING.loginTitle}
+            {branding.loginTitle}
           </h1>
           <p className="brand-copy mt-4 max-w-2xl text-base leading-7">
-            {BRANDING.loginDescription}
+            {branding.loginDescription}
           </p>
 
-          <div className="brand-panel-soft mt-8 rounded-[1.75rem] p-6">
-            <p className="brand-kicker">{BRANDING.loginSupportTitle}</p>
-            <p className="brand-copy mt-3 text-sm leading-7">
-              {BRANDING.loginSupportText}
-            </p>
-            <div className="mt-5 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
-              <div className="rounded-[1.25rem] bg-white/80 p-4">
-                <p className="brand-kicker">Donde se cambia</p>
-                <p className="mt-2 font-semibold text-slate-900">src/lib/branding.ts</p>
-              </div>
-              <div className="rounded-[1.25rem] bg-white/80 p-4">
-                <p className="brand-kicker">Que controlas</p>
-                <p className="mt-2 font-semibold text-slate-900">
-                  colores, textos, tipografias y logo
-                </p>
+          <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_0.92fr]">
+            <div className="brand-panel-soft rounded-[1.75rem] p-6">
+              <p className="brand-kicker">{branding.loginSupportTitle}</p>
+              <p className="brand-copy mt-3 text-sm leading-7">
+                {branding.loginSupportText}
+              </p>
+              <div className="mt-5 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
+                <div className="rounded-[1.25rem] bg-white/80 p-4">
+                  <p className="brand-kicker">Donde se cambia</p>
+                  <p className="mt-2 font-semibold text-slate-900">
+                    Panel administrativo de diseno
+                  </p>
+                </div>
+                <div className="rounded-[1.25rem] bg-white/80 p-4">
+                  <p className="brand-kicker">Que controlas</p>
+                  <p className="mt-2 font-semibold text-slate-900">
+                    colores, textos, imagenes y logo
+                  </p>
+                </div>
               </div>
             </div>
+
+            {branding.assets.loginImageUrl ? (
+              <div className="brand-panel-soft overflow-hidden rounded-[1.75rem] p-3">
+                <img
+                  alt={`${branding.organizationName} portada`}
+                  className="h-full min-h-64 w-full rounded-[1.25rem] object-cover"
+                  src={branding.assets.loginImageUrl}
+                />
+              </div>
+            ) : (
+              <div className="brand-panel-soft rounded-[1.75rem] p-6">
+                <p className="brand-kicker">Vista institucional</p>
+                <h3 className="brand-title mt-3 text-2xl font-semibold">
+                  {branding.appTitle}
+                </h3>
+                <p className="brand-copy mt-3 text-sm leading-7">
+                  {branding.appSummary}
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
