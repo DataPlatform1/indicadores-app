@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Geist_Mono, Manrope } from "next/font/google";
 import { BRANDING } from "@/lib/branding";
+import { getResolvedBranding } from "@/lib/branding-settings";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -23,11 +24,13 @@ export const metadata: Metadata = {
   description: BRANDING.appDescription,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const branding = await getResolvedBranding();
+
   return (
     <html
       lang="es"
@@ -38,24 +41,24 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               :root {
-                --background: ${BRANDING.visualStyle.background};
-                --foreground: ${BRANDING.visualStyle.text};
-                --muted-text: ${BRANDING.visualStyle.mutedText};
-                --panel-background: ${BRANDING.visualStyle.panelBackground};
-                --panel-border: ${BRANDING.visualStyle.panelBorder};
-                --muted-surface: ${BRANDING.visualStyle.mutedSurface};
-                --brand-primary: ${BRANDING.visualStyle.primary};
-                --brand-primary-hover: ${BRANDING.visualStyle.primaryHover};
-                --brand-secondary: ${BRANDING.visualStyle.secondary};
-                --brand-accent: ${BRANDING.visualStyle.accent};
-                --brand-accent-text: ${BRANDING.visualStyle.accentText};
-                --field-border: ${BRANDING.visualStyle.inputBorder};
-                --field-focus: ${BRANDING.visualStyle.inputFocus};
-                --field-disabled: ${BRANDING.visualStyle.inputDisabled};
-                --card-shadow: ${BRANDING.visualStyle.cardShadow};
-                --font-app-sans: var(${BRANDING.fonts.sansVar});
-                --font-app-display: var(${BRANDING.fonts.displayVar});
-                --font-app-mono: var(${BRANDING.fonts.monoVar});
+                --background: ${branding.visualStyle.background};
+                --foreground: ${branding.visualStyle.text};
+                --muted-text: ${branding.visualStyle.mutedText};
+                --panel-background: ${branding.visualStyle.panelBackground};
+                --panel-border: ${branding.visualStyle.panelBorder};
+                --muted-surface: ${branding.visualStyle.mutedSurface};
+                --brand-primary: ${branding.visualStyle.primary};
+                --brand-primary-hover: ${branding.visualStyle.primaryHover};
+                --brand-secondary: ${branding.visualStyle.secondary};
+                --brand-accent: ${branding.visualStyle.accent};
+                --brand-accent-text: ${branding.visualStyle.accentText};
+                --field-border: ${branding.visualStyle.inputBorder};
+                --field-focus: ${branding.visualStyle.inputFocus};
+                --field-disabled: ${branding.visualStyle.inputDisabled};
+                --card-shadow: ${branding.visualStyle.cardShadow};
+                --font-app-sans: var(${branding.fonts.sansVar});
+                --font-app-display: var(${branding.fonts.displayVar});
+                --font-app-mono: var(${branding.fonts.monoVar});
               }
             `,
           }}
