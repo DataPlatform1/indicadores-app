@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #eff6f4;
+  --background: radial-gradient(circle at top, #e0f2fe 0%, #f8fafc 44%, #eef6e8 100%);
   --foreground: #0f172a;
+  --muted-text: #475569;
+  --panel-background: rgba(255, 255, 255, 0.88);
+  --panel-border: rgba(255, 255, 255, 0.76);
+  --muted-surface: rgba(248, 250, 252, 0.92);
+  --brand-primary: #0f172a;
+  --brand-primary-hover: #1e293b;
+  --brand-secondary: #0f766e;
+  --brand-accent: #c8f2e9;
+  --brand-accent-text: #115e59;
+  --field-border: #cbd5e1;
+  --field-focus: #0f766e;
+  --field-disabled: #e2e8f0;
+  --card-shadow: 0 30px 80px rgba(20, 38, 62, 0.12);
+  --font-app-sans: Arial, Helvetica, sans-serif;
+  --font-app-display: Georgia, "Times New Roman", serif;
+  --font-app-mono: "Courier New", monospace;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-app-sans);
+  --font-mono: var(--font-app-mono);
 }
 
 * {
@@ -23,16 +39,118 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-app-sans), Arial, Helvetica, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-app-display), Georgia, "Times New Roman", serif;
+}
+
+.brand-page {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.brand-panel {
+  border: 1px solid var(--panel-border);
+  background: var(--panel-background);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(16px);
+}
+
+.brand-panel-soft {
+  border: 1px solid color-mix(in srgb, var(--panel-border) 78%, #ffffff 22%);
+  background: var(--muted-surface);
+  box-shadow: 0 18px 42px rgba(20, 38, 62, 0.08);
+}
+
+.brand-badge {
+  display: inline-flex;
+  border-radius: 9999px;
+  background: var(--brand-accent);
+  color: var(--brand-accent-text);
+  padding: 0.35rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.brand-kicker {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--muted-text);
+}
+
+.brand-title {
+  font-family: var(--font-app-display), Georgia, "Times New Roman", serif;
+  color: var(--foreground);
+}
+
+.brand-copy {
+  color: var(--muted-text);
+}
+
+.brand-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  min-height: 3rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.18);
+}
+
+.brand-button-primary {
+  border-radius: 9999px;
+  background: var(--brand-primary);
+  color: #fff;
+  transition: background-color 150ms ease;
+}
+
+.brand-button-primary:hover {
+  background: var(--brand-primary-hover);
+}
+
+.brand-button-secondary {
+  border-radius: 9999px;
+  border: 1px solid var(--field-border);
+  background: #fff;
+  color: var(--foreground);
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.brand-button-secondary:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.brand-link {
+  color: var(--brand-secondary);
+  font-weight: 600;
+}
+
+.brand-link:hover {
+  text-decoration: underline;
 }
 
 .field {
   width: 100%;
   border-radius: 1rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--field-border);
   background: #ffffff;
   padding: 0.9rem 1rem;
-  color: #0f172a;
+  color: var(--foreground);
   outline: none;
   transition:
     border-color 150ms ease,
@@ -41,12 +159,12 @@ body {
 }
 
 .field:focus {
-  border-color: #0f766e;
+  border-color: var(--field-focus);
   box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
 }
 
 .field:disabled {
   cursor: not-allowed;
-  background: #e2e8f0;
+  background: var(--field-disabled);
   color: #64748b;
 }
