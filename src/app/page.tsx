@@ -1,17 +1,8 @@
-import { redirect } from "next/navigation";
-import { getCurrentSession } from "@/lib/auth";
-import { canSubmit } from "@/lib/roles";
-
-export default async function HomePage() {
-  const session = await getCurrentSession();
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  if (canSubmit(session.role)) {
-    redirect("/formulario");
-  }
-
-  redirect("/sin-acceso");
+export default function HomePage() {
+  return (
+    <main style={{ padding: 40, fontFamily: "Arial, sans-serif" }}>
+      <h1>App desplegada correctamente</h1>
+      <p>La aplicacion ya responde en Railway.</p>
+    </main>
+  );
 }
