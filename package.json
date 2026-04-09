@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint",
-    "db:seed": "node scripts/seed.js"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "eslint",
+  "db:seed": "node scripts/seed.js",
+  "db:migrate:deploy": "prisma migrate deploy",
+  "db:setup": "prisma migrate deploy && node scripts/seed.js"
+}
+,
   "dependencies": {
     "@prisma/client": "^6.16.2",
     "next": "16.2.2",
