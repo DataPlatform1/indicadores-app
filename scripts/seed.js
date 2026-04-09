@@ -123,21 +123,6 @@ async function main() {
     },
   });
 
-  await prisma.user.upsert({
-    where: { email: "visor@indicadores.local" },
-    update: {
-      name: "Visor de Indicadores",
-      role: "VIEWER",
-      passwordHash: hashPassword("Viewer123*"),
-    },
-    create: {
-      name: "Visor de Indicadores",
-      email: "visor@indicadores.local",
-      role: "VIEWER",
-      passwordHash: hashPassword("Viewer123*"),
-    },
-  });
-
   for (const template of indicatorTemplates) {
     const process = await prisma.process.upsert({
       where: { name: template.process },
@@ -208,8 +193,6 @@ async function main() {
   console.log("clave: Admin123*");
   console.log("correo: editor@indicadores.local");
   console.log("clave: Editor123*");
-  console.log("correo: visor@indicadores.local");
-  console.log("clave: Viewer123*");
 }
 
 main()
