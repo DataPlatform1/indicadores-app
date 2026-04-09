@@ -1,83 +1,197 @@
 "use client";
 
-import { FormEvent, Fragment, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 
-type UserSummary = {
-  id: string;
-  name: string;
-  email: string;
-  role: "ADMIN" | "EDITOR" | "VIEWER";
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+type BrandingForm = {
+  organizationName: string;
+  shortName: string;
+  appTitle: string;
+  appDescription: string;
+  appEyebrow: string;
+  appSummary: string;
+  loginBadge: string;
+  loginTitle: string;
+  loginDescription: string;
+  loginSupportTitle: string;
+  loginSupportText: string;
+  background: string;
+  panelBackground: string;
+  panelBorder: string;
+  mutedSurface: string;
+  primary: string;
+  primaryHover: string;
+  secondary: string;
+  accent: string;
+  accentText: string;
+  text: string;
+  mutedText: string;
+  inputBorder: string;
+  inputFocus: string;
+  inputDisabled: string;
+  cardShadow: string;
+  logoText: string;
+  loginImageUrl: string;
+  logoImageUrl: string;
 };
 
-const initialForm = {
-  name: "",
-  email: "",
-  password: "",
-  role: "EDITOR" as UserSummary["role"],
+const emptyForm: BrandingForm = {
+  organizationName: "",
+  shortName: "",
+  appTitle: "",
+  appDescription: "",
+  appEyebrow: "",
+  appSummary: "",
+  loginBadge: "",
+  loginTitle: "",
+  loginDescription: "",
+  loginSupportTitle: "",
+  loginSupportText: "",
+  background: "",
+  panelBackground: "",
+  panelBorder: "",
+  mutedSurface: "",
+  primary: "",
+  primaryHover: "",
+  secondary: "",
+  accent: "",
+  accentText: "",
+  text: "",
+  mutedText: "",
+  inputBorder: "",
+  inputFocus: "",
+  inputDisabled: "",
+  cardShadow: "",
+  logoText: "",
+  loginImageUrl: "",
+  logoImageUrl: "",
 };
 
-export default function UsuariosAdminClient() {
-  const [users, setUsers] = useState<UserSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isUpdating, setIsUpdating] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<string | null>(null);
+export default function DisenoAdminClient() {
+  const [form, setForm] = useState<BrandingForm>(emptyForm);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState(initialForm);
-  const [editingUserId, setEditingUserId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState({
-    name: "",
-    password: "",
-    role: "EDITOR" as UserSummary["role"],
-    isActive: true,
-  });
 
   useEffect(() => {
-    async function loadUsers() {
+    async function loadBranding() {
       try {
-        const response = await fetch("/api/users", {
+        const response = await fetch("/api/branding", {
           cache: "no-store",
           credentials: "include",
         });
-
         const payload = (await response.json()) as {
           message?: string;
-          users?: UserSummary[];
+          settings?: Partial<BrandingForm> | null;
+          defaults?: {
+            organizationName: string;
+            shortName: string;
+            appTitle: string;
+            appDescription: string;
+            appEyebrow: string;
+            appSummary: string;
+            loginBadge: string;
+            loginTitle: string;
+            loginDescription: string;
+            loginSupportTitle: string;
+            loginSupportText: string;
+            visualStyle: {
+              background: string;
+              panelBackground: string;
+              panelBorder: string;
+              mutedSurface: string;
+              primary: string;
+              primaryHover: string;
+              secondary: string;
+              accent: string;
+              accentText: string;
+              text: string;
+              mutedText: string;
+              inputBorder: string;
+              inputFocus: string;
+              inputDisabled: string;
+              cardShadow: string;
+            };
+            assets: {
+              logoText: string;
+              loginImageUrl: string;
+              logoImageUrl: string;
+            };
+          };
         };
 
-        if (!response.ok) {
-          throw new Error(payload.message || "No fue posible cargar usuarios.");
+        if (!response.ok || !payload.defaults) {
+          throw new Error(payload.message || "No fue posible cargar la configuracion visual.");
         }
 
-        setUsers(payload.users ?? []);
+        const defaults = payload.defaults;
+        const settings = payload.settings;
+
+        setForm({
+          organizationName: settings?.organizationName ?? defaults.organizationName,
+          shortName: settings?.shortName ?? defaults.shortName,
+          appTitle: settings?.appTitle ?? defaults.appTitle,
+          appDescription: settings?.appDescription ?? defaults.appDescription,
+          appEyebrow: settings?.appEyebrow ?? defaults.appEyebrow,
+          appSummary: settings?.appSummary ?? defaults.appSummary,
+          loginBadge: settings?.loginBadge ?? defaults.loginBadge,
+          loginTitle: settings?.loginTitle ?? defaults.loginTitle,
+          loginDescription: settings?.loginDescription ?? defaults.loginDescription,
+          loginSupportTitle:
+            settings?.loginSupportTitle ?? defaults.loginSupportTitle,
+          loginSupportText: settings?.loginSupportText ?? defaults.loginSupportText,
+          background: settings?.background ?? defaults.visualStyle.background,
+          panelBackground:
+            settings?.panelBackground ?? defaults.visualStyle.panelBackground,
+          panelBorder: settings?.panelBorder ?? defaults.visualStyle.panelBorder,
+          mutedSurface:
+            settings?.mutedSurface ?? defaults.visualStyle.mutedSurface,
+          primary: settings?.primary ?? defaults.visualStyle.primary,
+          primaryHover: settings?.primaryHover ?? defaults.visualStyle.primaryHover,
+          secondary: settings?.secondary ?? defaults.visualStyle.secondary,
+          accent: settings?.accent ?? defaults.visualStyle.accent,
+          accentText: settings?.accentText ?? defaults.visualStyle.accentText,
+          text: settings?.text ?? defaults.visualStyle.text,
+          mutedText: settings?.mutedText ?? defaults.visualStyle.mutedText,
+          inputBorder: settings?.inputBorder ?? defaults.visualStyle.inputBorder,
+          inputFocus: settings?.inputFocus ?? defaults.visualStyle.inputFocus,
+          inputDisabled:
+            settings?.inputDisabled ?? defaults.visualStyle.inputDisabled,
+          cardShadow: settings?.cardShadow ?? defaults.visualStyle.cardShadow,
+          logoText: settings?.logoText ?? defaults.assets.logoText,
+          loginImageUrl:
+            settings?.loginImageUrl ?? defaults.assets.loginImageUrl ?? "",
+          logoImageUrl: settings?.logoImageUrl ?? defaults.assets.logoImageUrl ?? "",
+        });
       } catch (requestError) {
         console.error(requestError);
         setError(
           requestError instanceof Error
             ? requestError.message
-            : "No fue posible cargar usuarios.",
+            : "No fue posible cargar la configuracion visual.",
         );
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     }
 
-    loadUsers();
+    loadBranding();
   }, []);
+
+  function updateField<K extends keyof BrandingForm>(field: K, value: BrandingForm[K]) {
+    setForm((current) => ({ ...current, [field]: value }));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSaving(true);
+    setSaving(true);
+    setMessage(null);
     setError(null);
-    setFeedback(null);
 
     try {
-      const response = await fetch("/api/users", {
-        method: "POST",
+      const response = await fetch("/api/branding", {
+        method: "PATCH",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
@@ -85,189 +199,166 @@ export default function UsuariosAdminClient() {
         body: JSON.stringify(form),
       });
 
-      const payload = (await response.json()) as {
-        message?: string;
-        user?: UserSummary;
-      };
+      const payload = (await response.json()) as { message?: string };
 
-      if (!response.ok || !payload.user) {
-        throw new Error(payload.message || "No fue posible crear el usuario.");
+      if (!response.ok) {
+        throw new Error(payload.message || "No fue posible guardar el diseno.");
       }
 
-      setUsers((current) => [payload.user!, ...current]);
-      setForm(initialForm);
-      setFeedback("Usuario creado correctamente.");
+      setMessage("Configuracion visual actualizada correctamente.");
     } catch (requestError) {
       console.error(requestError);
       setError(
         requestError instanceof Error
           ? requestError.message
-          : "No fue posible crear el usuario.",
+          : "No fue posible guardar el diseno.",
       );
     } finally {
-      setIsSaving(false);
-    }
-  }
-
-  function startEditingUser(user: UserSummary) {
-    setEditingUserId(user.id);
-    setEditForm({
-      name: user.name,
-      password: "",
-      role: user.role,
-      isActive: user.isActive,
-    });
-    setFeedback(null);
-    setError(null);
-  }
-
-  function cancelEditingUser() {
-    setEditingUserId(null);
-    setEditForm({
-      name: "",
-      password: "",
-      role: "EDITOR",
-      isActive: true,
-    });
-  }
-
-  async function handleUpdateUser(userId: string) {
-    setIsUpdating(userId);
-    setError(null);
-    setFeedback(null);
-
-    try {
-      const response = await fetch("/api/users", {
-        method: "PATCH",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: userId,
-          name: editForm.name,
-          password: editForm.password || undefined,
-          role: editForm.role,
-          isActive: editForm.isActive,
-        }),
-      });
-
-      const payload = (await response.json()) as {
-        message?: string;
-        user?: UserSummary;
-      };
-
-      if (!response.ok || !payload.user) {
-        throw new Error(payload.message || "No fue posible actualizar el usuario.");
-      }
-
-      setUsers((current) =>
-        current.map((user) => (user.id === userId ? payload.user! : user)),
-      );
-      setFeedback("Usuario actualizado correctamente.");
-      cancelEditingUser();
-    } catch (requestError) {
-      console.error(requestError);
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "No fue posible actualizar el usuario.",
-      );
-    } finally {
-      setIsUpdating(null);
+      setSaving(false);
     }
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#dff4ff_0%,#f7fbff_45%,#eef4e8_100%)] px-4 py-8 text-slate-900">
+    <main className="brand-page px-4 py-8 text-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <section className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur">
+        <section className="brand-panel rounded-[2rem] p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-semibold text-teal-900">
-                Panel administrativo
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
-                Gestion de usuarios
+              <p className="brand-badge">Panel administrativo</p>
+              <h1 className="brand-title mt-4 text-4xl font-semibold tracking-tight">
+                Gestion de diseno
               </h1>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Desde aqui el administrador puede crear usuarios, actualizar roles y
-                activar o desactivar accesos.
+              <p className="brand-copy mt-2 max-w-3xl text-sm leading-6">
+                Desde aqui puedes cambiar nombre institucional, textos del login,
+                colores principales y recursos visuales sin tocar el codigo.
               </p>
             </div>
 
-            <Link
-              className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-              href="/formulario"
-            >
-              Volver al formulario
-            </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/admin/indicadores">
+                Administrar indicadores
+              </Link>
+              <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/formulario">
+                Volver al formulario
+              </Link>
+            </div>
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <section className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
-            <h2 className="text-2xl font-semibold text-slate-950">Crear usuario</h2>
-            <p className="mt-2 text-sm text-slate-500">
-              Define nombre, correo, clave y rol.
-            </p>
+        <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <form className="brand-panel rounded-[2rem] p-6" onSubmit={handleSubmit}>
+            <div className="grid gap-6">
+              <SectionTitle
+                title="Identidad institucional"
+                description="Nombre, resumen y textos principales de la aplicacion."
+              />
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Nombre de la organizacion" required>
+                  <input className="field" value={form.organizationName} onChange={(event) => updateField("organizationName", event.target.value)} required />
+                </Field>
+                <Field label="Nombre corto" required>
+                  <input className="field" value={form.shortName} onChange={(event) => updateField("shortName", event.target.value)} required />
+                </Field>
+                <Field label="Titulo de la app" required>
+                  <input className="field" value={form.appTitle} onChange={(event) => updateField("appTitle", event.target.value)} required />
+                </Field>
+                <Field label="Resumen de la app" required>
+                  <input className="field" value={form.appSummary} onChange={(event) => updateField("appSummary", event.target.value)} required />
+                </Field>
+                <Field label="Descripcion general" required>
+                  <textarea className="field min-h-24 resize-y" value={form.appDescription} onChange={(event) => updateField("appDescription", event.target.value)} required />
+                </Field>
+                <Field label="Texto corto superior" required>
+                  <input className="field" value={form.appEyebrow} onChange={(event) => updateField("appEyebrow", event.target.value)} required />
+                </Field>
+              </div>
 
-            <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
-              <Field label="Nombre" required>
-                <input
-                  className="field"
-                  type="text"
-                  value={form.name}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, name: event.target.value }))
-                  }
-                  required
-                />
-              </Field>
+              <SectionTitle
+                title="Textos del login"
+                description="Mensajes que ven los usuarios antes de iniciar sesion."
+              />
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Badge del login" required>
+                  <input className="field" value={form.loginBadge} onChange={(event) => updateField("loginBadge", event.target.value)} required />
+                </Field>
+                <Field label="Titulo del login" required>
+                  <input className="field" value={form.loginTitle} onChange={(event) => updateField("loginTitle", event.target.value)} required />
+                </Field>
+                <Field label="Descripcion del login" required>
+                  <textarea className="field min-h-24 resize-y" value={form.loginDescription} onChange={(event) => updateField("loginDescription", event.target.value)} required />
+                </Field>
+                <Field label="Titulo de apoyo" required>
+                  <input className="field" value={form.loginSupportTitle} onChange={(event) => updateField("loginSupportTitle", event.target.value)} required />
+                </Field>
+                <Field label="Texto de apoyo" required>
+                  <textarea className="field min-h-24 resize-y" value={form.loginSupportText} onChange={(event) => updateField("loginSupportText", event.target.value)} required />
+                </Field>
+                <Field label="Logo en texto" required>
+                  <input className="field" value={form.logoText} onChange={(event) => updateField("logoText", event.target.value)} required />
+                </Field>
+                <Field label="URL imagen login">
+                  <input className="field" value={form.loginImageUrl} onChange={(event) => updateField("loginImageUrl", event.target.value)} />
+                </Field>
+                <Field label="URL logo institucional">
+                  <input className="field" value={form.logoImageUrl} onChange={(event) => updateField("logoImageUrl", event.target.value)} />
+                </Field>
+              </div>
 
-              <Field label="Correo" required>
-                <input
-                  className="field"
-                  type="email"
-                  value={form.email}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, email: event.target.value }))
-                  }
-                  required
-                />
-              </Field>
+              <SectionTitle
+                title="Colores y superficie"
+                description="Configura la apariencia general de toda la aplicacion."
+              />
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Fondo principal" required>
+                  <input className="field" value={form.background} onChange={(event) => updateField("background", event.target.value)} required />
+                </Field>
+                <Field label="Fondo de panel" required>
+                  <input className="field" value={form.panelBackground} onChange={(event) => updateField("panelBackground", event.target.value)} required />
+                </Field>
+                <Field label="Borde de panel" required>
+                  <input className="field" value={form.panelBorder} onChange={(event) => updateField("panelBorder", event.target.value)} required />
+                </Field>
+                <Field label="Superficie suave" required>
+                  <input className="field" value={form.mutedSurface} onChange={(event) => updateField("mutedSurface", event.target.value)} required />
+                </Field>
+                <Field label="Color primario" required>
+                  <input className="field" value={form.primary} onChange={(event) => updateField("primary", event.target.value)} required />
+                </Field>
+                <Field label="Primario hover" required>
+                  <input className="field" value={form.primaryHover} onChange={(event) => updateField("primaryHover", event.target.value)} required />
+                </Field>
+                <Field label="Color secundario" required>
+                  <input className="field" value={form.secondary} onChange={(event) => updateField("secondary", event.target.value)} required />
+                </Field>
+                <Field label="Color de acento" required>
+                  <input className="field" value={form.accent} onChange={(event) => updateField("accent", event.target.value)} required />
+                </Field>
+                <Field label="Texto del acento" required>
+                  <input className="field" value={form.accentText} onChange={(event) => updateField("accentText", event.target.value)} required />
+                </Field>
+                <Field label="Color del texto" required>
+                  <input className="field" value={form.text} onChange={(event) => updateField("text", event.target.value)} required />
+                </Field>
+                <Field label="Texto secundario" required>
+                  <input className="field" value={form.mutedText} onChange={(event) => updateField("mutedText", event.target.value)} required />
+                </Field>
+                <Field label="Borde de campos" required>
+                  <input className="field" value={form.inputBorder} onChange={(event) => updateField("inputBorder", event.target.value)} required />
+                </Field>
+                <Field label="Foco de campos" required>
+                  <input className="field" value={form.inputFocus} onChange={(event) => updateField("inputFocus", event.target.value)} required />
+                </Field>
+                <Field label="Fondo de campos deshabilitados" required>
+                  <input className="field" value={form.inputDisabled} onChange={(event) => updateField("inputDisabled", event.target.value)} required />
+                </Field>
+                <Field label="Sombra principal" required>
+                  <input className="field" value={form.cardShadow} onChange={(event) => updateField("cardShadow", event.target.value)} required />
+                </Field>
+              </div>
 
-              <Field label="Contrasena" required>
-                <input
-                  className="field"
-                  type="password"
-                  value={form.password}
-                  onChange={(event) =>
-                    setForm((current) => ({ ...current, password: event.target.value }))
-                  }
-                  required
-                />
-              </Field>
-
-              <Field label="Rol" required>
-                <select
-                  className="field"
-                  value={form.role}
-                  onChange={(event) =>
-                    setForm((current) => ({
-                      ...current,
-                      role: event.target.value as UserSummary["role"],
-                    }))
-                  }
-                >
-                  <option value="EDITOR">EDITOR</option>
-                  <option value="ADMIN">ADMIN</option>
-                </select>
-              </Field>
-
-              {feedback ? (
+              {message ? (
                 <div className="rounded-[1.25rem] border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                  {feedback}
+                  {message}
                 </div>
               ) : null}
 
@@ -278,181 +369,97 @@ export default function UsuariosAdminClient() {
               ) : null}
 
               <button
-                className="rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-                disabled={isSaving}
+                className="brand-button-primary px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:bg-slate-400"
+                disabled={saving || loading}
                 type="submit"
               >
-                {isSaving ? "Guardando..." : "Crear usuario"}
+                {saving ? "Guardando..." : "Guardar configuracion visual"}
               </button>
-            </form>
-          </section>
-
-          <section className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="text-2xl font-semibold text-slate-950">Usuarios registrados</h2>
-                <p className="mt-2 text-sm text-slate-500">
-                  Usuarios creados en la base de datos y su estado actual.
-                </p>
-              </div>
-              <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700">
-                {users.length} usuarios
-              </span>
             </div>
+          </form>
 
-            {isLoading ? (
-              <p className="mt-6 text-sm text-slate-500">Cargando usuarios...</p>
-            ) : users.length === 0 ? (
-              <p className="mt-6 text-sm text-slate-500">Aun no hay usuarios creados.</p>
+          <section className="brand-panel rounded-[2rem] p-6">
+            <SectionTitle
+              title="Vista previa orientativa"
+              description="Te ayuda a entender como impactaran los cambios antes de navegar por toda la app."
+            />
+
+            {loading ? (
+              <p className="brand-copy mt-4 text-sm">Cargando configuracion visual...</p>
             ) : (
-              <div className="mt-6 overflow-x-auto">
-                <table className="min-w-full border-separate border-spacing-y-3">
-                  <thead>
-                    <tr className="text-left text-xs uppercase tracking-[0.18em] text-slate-500">
-                      <th className="px-4">Nombre</th>
-                      <th className="px-4">Correo</th>
-                      <th className="px-4">Rol</th>
-                      <th className="px-4">Estado</th>
-                      <th className="px-4">Creado</th>
-                      <th className="px-4">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user) => (
-                      <Fragment key={user.id}>
-                        <tr
-                          className="rounded-2xl bg-slate-50 text-sm text-slate-700 shadow-[0_8px_24px_rgba(15,23,42,0.06)]"
-                        >
-                          <td className="rounded-l-2xl px-4 py-4 font-semibold text-slate-950">
-                            {user.name}
-                          </td>
-                          <td className="px-4 py-4">{user.email}</td>
-                          <td className="px-4 py-4">{user.role}</td>
-                          <td className="px-4 py-4">
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                user.isActive
-                                  ? "bg-emerald-100 text-emerald-900"
-                                  : "bg-slate-200 text-slate-700"
-                              }`}
-                            >
-                              {user.isActive ? "Activo" : "Inactivo"}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4">
-                            {new Date(user.createdAt).toLocaleString("es-CO")}
-                          </td>
-                          <td className="rounded-r-2xl px-4 py-4">
-                            <button
-                              className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
-                              onClick={() => startEditingUser(user)}
-                              type="button"
-                            >
-                              Editar
-                            </button>
-                          </td>
-                        </tr>
+              <div className="mt-6 space-y-5">
+                <div
+                  className="rounded-[1.75rem] p-6"
+                  style={{
+                    background: form.background,
+                    boxShadow: form.cardShadow,
+                  }}
+                >
+                  <div
+                    className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-full text-sm font-extrabold text-white"
+                    style={{
+                      background: `linear-gradient(135deg, ${form.primary}, ${form.secondary})`,
+                    }}
+                  >
+                    {form.logoText}
+                  </div>
+                  <p
+                    className="mt-4 inline-flex rounded-full px-4 py-1 text-sm font-semibold"
+                    style={{
+                      background: form.accent,
+                      color: form.accentText,
+                    }}
+                  >
+                    {form.loginBadge}
+                  </p>
+                  <h3 className="mt-4 text-3xl font-semibold" style={{ color: form.text }}>
+                    {form.loginTitle}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6" style={{ color: form.mutedText }}>
+                    {form.loginDescription}
+                  </p>
+                </div>
 
-                        {editingUserId === user.id ? (
-                          <tr>
-                            <td className="px-2 pt-2" colSpan={6}>
-                              <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4">
-                                <div className="grid gap-4 md:grid-cols-2">
-                                  <Field label="Nombre" required>
-                                    <input
-                                      className="field"
-                                      type="text"
-                                      value={editForm.name}
-                                      onChange={(event) =>
-                                        setEditForm((current) => ({
-                                          ...current,
-                                          name: event.target.value,
-                                        }))
-                                      }
-                                      required
-                                    />
-                                  </Field>
-
-                                  <Field label="Rol" required>
-                                    <select
-                                      className="field"
-                                      value={editForm.role}
-                                      onChange={(event) =>
-                                        setEditForm((current) => ({
-                                          ...current,
-                                          role: event.target.value as UserSummary["role"],
-                                        }))
-                                      }
-                                    >
-                                      <option value="EDITOR">EDITOR</option>
-                                      <option value="ADMIN">ADMIN</option>
-                                    </select>
-                                  </Field>
-
-                                  <Field label="Nueva contrasena">
-                                    <input
-                                      className="field"
-                                      type="password"
-                                      placeholder="Opcional"
-                                      value={editForm.password}
-                                      onChange={(event) =>
-                                        setEditForm((current) => ({
-                                          ...current,
-                                          password: event.target.value,
-                                        }))
-                                      }
-                                    />
-                                  </Field>
-
-                                  <label className="grid gap-2 text-sm font-medium text-slate-700">
-                                    <span>Estado</span>
-                                    <select
-                                      className="field"
-                                      value={editForm.isActive ? "ACTIVO" : "INACTIVO"}
-                                      onChange={(event) =>
-                                        setEditForm((current) => ({
-                                          ...current,
-                                          isActive: event.target.value === "ACTIVO",
-                                        }))
-                                      }
-                                    >
-                                      <option value="ACTIVO">Activo</option>
-                                      <option value="INACTIVO">Inactivo</option>
-                                    </select>
-                                  </label>
-                                </div>
-
-                                <div className="mt-4 flex flex-wrap gap-3">
-                                  <button
-                                    className="rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
-                                    disabled={isUpdating === user.id}
-                                    onClick={() => handleUpdateUser(user.id)}
-                                    type="button"
-                                  >
-                                    {isUpdating === user.id ? "Guardando..." : "Guardar cambios"}
-                                  </button>
-                                  <button
-                                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-100"
-                                    onClick={cancelEditingUser}
-                                    type="button"
-                                  >
-                                    Cancelar
-                                  </button>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : null}
-                      </Fragment>
-                    ))}
-                  </tbody>
-                </table>
+                <div
+                  className="rounded-[1.5rem] p-5"
+                  style={{
+                    background: form.panelBackground,
+                    border: `1px solid ${form.panelBorder}`,
+                    boxShadow: form.cardShadow,
+                  }}
+                >
+                  <p className="text-sm font-semibold" style={{ color: form.text }}>
+                    Boton principal
+                  </p>
+                  <button
+                    className="mt-4 rounded-full px-5 py-3 text-sm font-semibold text-white"
+                    style={{ background: form.primary }}
+                    type="button"
+                  >
+                    Iniciar sesion
+                  </button>
+                </div>
               </div>
             )}
           </section>
         </section>
       </div>
     </main>
+  );
+}
+
+function SectionTitle({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div>
+      <h2 className="brand-title text-2xl font-semibold">{title}</h2>
+      <p className="brand-copy mt-2 text-sm leading-6">{description}</p>
+    </div>
   );
 }
 
