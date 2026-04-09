@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { canSubmit, canViewHistory } from "@/lib/roles";
+import { canManageUsers, canSubmit, canViewHistory } from "@/lib/roles";
 
 const justifications = [
   "N/A",
@@ -185,6 +185,7 @@ export default function FormularioIndicadores() {
 
   const canCurrentUserSubmit = canSubmit(sessionUser?.role);
   const canCurrentUserViewHistory = canViewHistory(sessionUser?.role);
+  const canCurrentUserManageUsers = canManageUsers(sessionUser?.role);
 
   function updateField<K extends keyof FormValues>(field: K, value: FormValues[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
@@ -321,6 +322,14 @@ export default function FormularioIndicadores() {
             </div>
 
             <div className="flex flex-wrap gap-3">
+              {canCurrentUserManageUsers ? (
+                <Link
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                  href="/admin/usuarios"
+                >
+                  Administrar usuarios
+                </Link>
+              ) : null}
               {canCurrentUserViewHistory ? (
                 <Link
                   className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
@@ -627,7 +636,7 @@ export default function FormularioIndicadores() {
               <div className="mt-4 grid gap-3 text-sm leading-6 text-slate-600">
                 <p>ADMIN: diligencia formularios y consulta registros recientes.</p>
                 <p>EDITOR: diligencia formularios, sin acceso al historial.</p>
-                <p>VIEWER: sin acceso al formulario.</p>
+                <p>Usuarios no registrados: sin acceso al formulario.</p>
               </div>
             </section>
 
@@ -768,3 +777,4 @@ function StatCard({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
