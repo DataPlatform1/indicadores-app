@@ -4,6 +4,46 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+const DEFAULT_BRANDING = {
+  organizationName: "Indicadores App",
+  shortName: "IA",
+  appTitle: "Tablero de indicadores",
+  appDescription: "Formulario de indicadores organizacionales con Next.js",
+  appEyebrow: "Sistema institucional",
+  appSummary:
+    "Aplicacion para administrar usuarios, indicadores y resultados del tablero de mando.",
+  loginBadge: "Acceso al sistema",
+  loginTitle: "Inicia sesion para acceder el formulario de indicadores",
+  loginDescription:
+    "Esta pantalla esta separada del formulario para que el acceso sea mas claro y profesional.",
+  loginSupportTitle: "Configuracion visual centralizada",
+  loginSupportText:
+    "Los colores, fuentes, nombre institucional y recursos visuales se controlan desde un solo archivo de configuracion.",
+  visualStyle: {
+    background:
+      "radial-gradient(circle at top, #e0f2fe 0%, #f8fafc 44%, #eef6e8 100%)",
+    panelBackground: "rgba(255,255,255,0.88)",
+    panelBorder: "rgba(255,255,255,0.76)",
+    mutedSurface: "rgba(248,250,252,0.92)",
+    primary: "#0f172a",
+    primaryHover: "#1e293b",
+    secondary: "#0f766e",
+    accent: "#c8f2e9",
+    accentText: "#115e59",
+    text: "#0f172a",
+    mutedText: "#475569",
+    inputBorder: "#cbd5e1",
+    inputFocus: "#0f766e",
+    inputDisabled: "#e2e8f0",
+    cardShadow: "0 30px 80px rgba(20, 38, 62, 0.12)",
+  },
+  assets: {
+    logoText: "IA",
+    loginImageUrl: "",
+    logoImageUrl: "",
+  },
+};
+
 function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");
   const hash = scryptSync(password, salt, 64).toString("hex");
@@ -93,6 +133,73 @@ const indicatorTemplates = [
 ];
 
 async function main() {
+  await prisma.brandSettings.upsert({
+    where: { id: "default" },
+    update: {
+      organizationName: DEFAULT_BRANDING.organizationName,
+      shortName: DEFAULT_BRANDING.shortName,
+      appTitle: DEFAULT_BRANDING.appTitle,
+      appDescription: DEFAULT_BRANDING.appDescription,
+      appEyebrow: DEFAULT_BRANDING.appEyebrow,
+      appSummary: DEFAULT_BRANDING.appSummary,
+      loginBadge: DEFAULT_BRANDING.loginBadge,
+      loginTitle: DEFAULT_BRANDING.loginTitle,
+      loginDescription: DEFAULT_BRANDING.loginDescription,
+      loginSupportTitle: DEFAULT_BRANDING.loginSupportTitle,
+      loginSupportText: DEFAULT_BRANDING.loginSupportText,
+      background: DEFAULT_BRANDING.visualStyle.background,
+      panelBackground: DEFAULT_BRANDING.visualStyle.panelBackground,
+      panelBorder: DEFAULT_BRANDING.visualStyle.panelBorder,
+      mutedSurface: DEFAULT_BRANDING.visualStyle.mutedSurface,
+      primary: DEFAULT_BRANDING.visualStyle.primary,
+      primaryHover: DEFAULT_BRANDING.visualStyle.primaryHover,
+      secondary: DEFAULT_BRANDING.visualStyle.secondary,
+      accent: DEFAULT_BRANDING.visualStyle.accent,
+      accentText: DEFAULT_BRANDING.visualStyle.accentText,
+      text: DEFAULT_BRANDING.visualStyle.text,
+      mutedText: DEFAULT_BRANDING.visualStyle.mutedText,
+      inputBorder: DEFAULT_BRANDING.visualStyle.inputBorder,
+      inputFocus: DEFAULT_BRANDING.visualStyle.inputFocus,
+      inputDisabled: DEFAULT_BRANDING.visualStyle.inputDisabled,
+      cardShadow: DEFAULT_BRANDING.visualStyle.cardShadow,
+      logoText: DEFAULT_BRANDING.assets.logoText,
+      loginImageUrl: DEFAULT_BRANDING.assets.loginImageUrl || null,
+      logoImageUrl: DEFAULT_BRANDING.assets.logoImageUrl || null,
+    },
+    create: {
+      id: "default",
+      organizationName: DEFAULT_BRANDING.organizationName,
+      shortName: DEFAULT_BRANDING.shortName,
+      appTitle: DEFAULT_BRANDING.appTitle,
+      appDescription: DEFAULT_BRANDING.appDescription,
+      appEyebrow: DEFAULT_BRANDING.appEyebrow,
+      appSummary: DEFAULT_BRANDING.appSummary,
+      loginBadge: DEFAULT_BRANDING.loginBadge,
+      loginTitle: DEFAULT_BRANDING.loginTitle,
+      loginDescription: DEFAULT_BRANDING.loginDescription,
+      loginSupportTitle: DEFAULT_BRANDING.loginSupportTitle,
+      loginSupportText: DEFAULT_BRANDING.loginSupportText,
+      background: DEFAULT_BRANDING.visualStyle.background,
+      panelBackground: DEFAULT_BRANDING.visualStyle.panelBackground,
+      panelBorder: DEFAULT_BRANDING.visualStyle.panelBorder,
+      mutedSurface: DEFAULT_BRANDING.visualStyle.mutedSurface,
+      primary: DEFAULT_BRANDING.visualStyle.primary,
+      primaryHover: DEFAULT_BRANDING.visualStyle.primaryHover,
+      secondary: DEFAULT_BRANDING.visualStyle.secondary,
+      accent: DEFAULT_BRANDING.visualStyle.accent,
+      accentText: DEFAULT_BRANDING.visualStyle.accentText,
+      text: DEFAULT_BRANDING.visualStyle.text,
+      mutedText: DEFAULT_BRANDING.visualStyle.mutedText,
+      inputBorder: DEFAULT_BRANDING.visualStyle.inputBorder,
+      inputFocus: DEFAULT_BRANDING.visualStyle.inputFocus,
+      inputDisabled: DEFAULT_BRANDING.visualStyle.inputDisabled,
+      cardShadow: DEFAULT_BRANDING.visualStyle.cardShadow,
+      logoText: DEFAULT_BRANDING.assets.logoText,
+      loginImageUrl: DEFAULT_BRANDING.assets.loginImageUrl || null,
+      logoImageUrl: DEFAULT_BRANDING.assets.logoImageUrl || null,
+    },
+  });
+
   await prisma.user.deleteMany({
     where: { email: "visor@indicadores.local" },
   });
