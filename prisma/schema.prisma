@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model User {
+  id           String            @id @default(cuid())
+  name         String
+  email        String            @unique
+  passwordHash String
+  role         UserRole          @default(EDITOR)
+  results      IndicatorResult[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model Process {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  description String?
+  indicators  Indicator[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Indicator {
+  id             String              @id @default(cuid())
+  code           String              @unique
+  name           String
+  management     String
+  evaluator      String
+  periodicity    String
+  level          String
+  unit           String
+  strategy       String?
+  status         String              @default("Activo")
+  deficientGoal  Decimal             @db.Decimal(10, 2)
+  acceptableGoal Decimal             @db.Decimal(10, 2)
+  objectiveGoal  Decimal             @db.Decimal(10, 2)
+  processId      String
+  process        Process             @relation(fields: [processId], references: [id], onDelete: Cascade)
+  variables      IndicatorVariable[]
+  results        IndicatorResult[]
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([processId])
+}
+
+model IndicatorVariable {
+  id          String                  @id @default(cuid())
+  name        String
+  sortOrder   Int
+  indicatorId String
+  indicator   Indicator               @relation(fields: [indicatorId], references: [id], onDelete: Cascade)
+  values      IndicatorResultVariable[]
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+
+  @@unique([indicatorId, sortOrder])
+  @@index([indicatorId])
+}
+
+model IndicatorResult {
+  id                String                   @id @default(cuid())
+  recordNumber      String                   @unique
+  reportingDate     DateTime
+  startDate         DateTime
+  endDate           DateTime
+  periodMonths      Int
+  resultValue       Decimal                  @db.Decimal(10, 2)
+  indicatorPercent  Decimal                  @db.Decimal(10, 2)
+  compliance        String
+  zeroJustification String?
+  analysis          String
+  observation       String?
+  indicatorId       String
+  submittedById     String?
+  submittedByName   String?
+  submittedByEmail  String?
+  indicator         Indicator                @relation(fields: [indicatorId], references: [id], onDelete: Restrict)
+  submittedBy       User?                    @relation(fields: [submittedById], references: [id], onDelete: SetNull)
+  variableValues    IndicatorResultVariable[]
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+
+  @@index([indicatorId])
+  @@index([reportingDate])
+  @@index([submittedById])
+}
+
+model IndicatorResultVariable {
+  id                String            @id @default(cuid())
+  numericValue      Decimal?          @db.Decimal(14, 2)
+  textValue         String?
+  resultId          String
+  indicatorVariableId String
+  result            IndicatorResult   @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  indicatorVariable IndicatorVariable @relation(fields: [indicatorVariableId], references: [id], onDelete: Restrict)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([resultId, indicatorVariableId])
+  @@index([resultId])
+  @@index([indicatorVariableId])
+}
