@@ -98,7 +98,7 @@ export default function LoginPage() {
             Acceso al sistema actualizado
           </p>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-tight text-slate-950">
-            Inicia sesion para diligenciar el formulario de indicadores
+            Inicia sesion para acceder el formulario de indicadores
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
             Esta pantalla esta separada del formulario para que el acceso sea mas claro y profesional.
