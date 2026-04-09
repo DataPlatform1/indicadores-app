@@ -7,6 +7,9 @@ export async function GET() {
   });
 
   const indicators = await prisma.indicator.findMany({
+    where: {
+      status: "Activo",
+    },
     include: {
       process: true,
       variables: {
