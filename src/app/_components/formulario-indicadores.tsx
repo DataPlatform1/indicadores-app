@@ -281,7 +281,8 @@ export default function FormularioIndicadores() {
               Registro de resultados del tablero de mando
             </h1>
             <p className="max-w-3xl text-base leading-7 text-slate-600">
-              Esta pantalla esta separada del login y solo permite el registro a los roles autorizados.
+              Esta pantalla esta separada del login y solo permite el registro a los roles
+              autorizados.
             </p>
           </div>
 
@@ -329,7 +330,14 @@ export default function FormularioIndicadores() {
                   Administrar indicadores
                 </Link>
               ) : null}
-
+              {canCurrentUserManageUsers ? (
+                <Link
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                  href="/admin/diseno"
+                >
+                  Administrar diseno
+                </Link>
+              ) : null}
               {canCurrentUserManageUsers ? (
                 <Link
                   className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
@@ -338,7 +346,6 @@ export default function FormularioIndicadores() {
                   Administrar usuarios
                 </Link>
               ) : null}
-
               {canCurrentUserViewHistory ? (
                 <Link
                   className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
@@ -347,7 +354,6 @@ export default function FormularioIndicadores() {
                   Ver historial completo
                 </Link>
               ) : null}
-
               <button
                 className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
                 onClick={handleLogout}
@@ -370,7 +376,8 @@ export default function FormularioIndicadores() {
                   Formulario de resultados
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Los campos cambian segun el indicador seleccionado y se cargan desde PostgreSQL.
+                  Los campos cambian segun el indicador seleccionado y se cargan desde
+                  PostgreSQL.
                 </p>
               </div>
               <button
@@ -786,3 +793,4 @@ function StatCard({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
