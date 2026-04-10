@@ -346,6 +346,14 @@ export default function FormularioIndicadores() {
                   Administrar usuarios
                 </Link>
               ) : null}
+              {canCurrentUserManageUsers ? (
+                <Link
+                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
+                  href="/admin/auditoria"
+                >
+                  Ver auditoria
+                </Link>
+              ) : null}
               {canCurrentUserViewHistory ? (
                 <Link
                   className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
