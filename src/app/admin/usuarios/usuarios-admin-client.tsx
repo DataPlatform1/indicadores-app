@@ -238,6 +238,9 @@ export default function DisenoAdminClient() {
               <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/admin/indicadores">
                 Administrar indicadores
               </Link>
+              <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/admin/auditoria">
+                Ver auditoria
+              </Link>
               <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/formulario">
                 Volver al formulario
               </Link>

@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AuditAction, AuditEntity } from "@prisma/client";
 import { hashPassword, getCurrentSession } from "@/lib/auth";
+import {
+  getAuditRequestContext,
+  getChangedFields,
+  logAuditEvent,
+} from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { canManageUsers } from "@/lib/roles";
 
@@ -88,23 +94,43 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const createdUser = await prisma.user.create({
-    data: {
-      name,
-      email,
-      role,
-      isActive: true,
-      passwordHash: hashPassword(password),
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      isActive: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+  const createdUser = await prisma.$transaction(async (transaction) => {
+    const user = await transaction.user.create({
+      data: {
+        name,
+        email,
+        role,
+        isActive: true,
+        passwordHash: hashPassword(password),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await logAuditEvent({
+      client: transaction,
+      actor: session,
+      action: AuditAction.CREATE,
+      entityType: AuditEntity.USER,
+      entityId: user.id,
+      summary: "Usuario creado.",
+      targetName: user.email,
+      metadata: {
+        role: user.role,
+        isActive: user.isActive,
+        name: user.name,
+      },
+      context: getAuditRequestContext(request),
+    });
+
+    return user;
   });
 
   return NextResponse.json({ user: createdUser }, { status: 201 });
@@ -145,6 +171,8 @@ export async function PATCH(request: NextRequest) {
     where: { id },
     select: {
       id: true,
+      name: true,
+      email: true,
       role: true,
       isActive: true,
     },
@@ -171,23 +199,66 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
-  const updatedUser = await prisma.user.update({
-    where: { id },
-    data: {
-      name,
-      role,
-      isActive,
-      ...(password ? { passwordHash: hashPassword(password) } : {}),
+  const nextUserState = {
+    name,
+    role,
+    isActive,
+  };
+  const changedFields = getChangedFields(
+    {
+      name: existingUser.name,
+      role: existingUser.role,
+      isActive: existingUser.isActive,
+      passwordChanged: false,
     },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      isActive: true,
-      createdAt: true,
-      updatedAt: true,
+    {
+      ...nextUserState,
+      passwordChanged: Boolean(password),
     },
+  );
+
+  const updatedUser = await prisma.$transaction(async (transaction) => {
+    const user = await transaction.user.update({
+      where: { id },
+      data: {
+        name,
+        role,
+        isActive,
+        ...(password ? { passwordHash: hashPassword(password) } : {}),
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    await logAuditEvent({
+      client: transaction,
+      actor: session,
+      action: AuditAction.UPDATE,
+      entityType: AuditEntity.USER,
+      entityId: user.id,
+      summary: "Usuario actualizado.",
+      targetName: user.email,
+      metadata: {
+        changedFields,
+        before: {
+          name: existingUser.name,
+          role: existingUser.role,
+          isActive: existingUser.isActive,
+        },
+        after: nextUserState,
+        passwordChanged: Boolean(password),
+      },
+      context: getAuditRequestContext(request),
+    });
+
+    return user;
   });
 
   return NextResponse.json({ user: updatedUser });

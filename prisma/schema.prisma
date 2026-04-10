@@ -13,6 +13,22 @@ enum UserRole {
   VIEWER
 }
 
+enum AuditAction {
+  CREATE
+  UPDATE
+  SUBMIT
+  LOGIN
+  LOGOUT
+}
+
+enum AuditEntity {
+  USER
+  INDICATOR
+  BRANDING
+  RESULT
+  AUTH
+}
+
 model User {
   id           String            @id @default(cuid())
   name         String
@@ -21,6 +37,7 @@ model User {
   role         UserRole          @default(EDITOR)
   isActive     Boolean           @default(true)
   results      IndicatorResult[]
+  auditLogs    AuditLog[]
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
 }
@@ -149,4 +166,26 @@ model IndicatorResultVariable {
   @@unique([resultId, indicatorVariableId])
   @@index([resultId])
   @@index([indicatorVariableId])
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  action      AuditAction
+  entityType  AuditEntity
+  entityId    String?
+  summary     String
+  targetName  String?
+  actorUserId String?
+  actorName   String?
+  actorEmail  String?
+  actorRole   String?
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+  actorUser   User?       @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  createdAt   DateTime    @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, createdAt])
+  @@index([actorUserId])
 }

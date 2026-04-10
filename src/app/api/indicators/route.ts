@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AuditAction, AuditEntity } from "@prisma/client";
+import {
+  getAuditRequestContext,
+  getChangedFields,
+  logAuditEvent,
+} from "@/lib/audit";
 import { getCurrentSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canManageUsers } from "@/lib/roles";
@@ -157,34 +163,54 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const createdIndicator = await prisma.indicator.create({
-    data: {
-      code,
-      name,
-      processId,
-      management,
-      evaluator,
-      periodicity,
-      level,
-      unit,
-      strategy,
-      status,
-      deficientGoal,
-      acceptableGoal,
-      objectiveGoal,
-      variables: {
-        create: variableNames.map((variableName, index) => ({
-          name: variableName,
-          sortOrder: index + 1,
-        })),
+  const createdIndicator = await prisma.$transaction(async (transaction) => {
+    const indicator = await transaction.indicator.create({
+      data: {
+        code,
+        name,
+        processId,
+        management,
+        evaluator,
+        periodicity,
+        level,
+        unit,
+        strategy,
+        status,
+        deficientGoal,
+        acceptableGoal,
+        objectiveGoal,
+        variables: {
+          create: variableNames.map((variableName, index) => ({
+            name: variableName,
+            sortOrder: index + 1,
+          })),
+        },
       },
-    },
-    include: {
-      process: true,
-      variables: {
-        orderBy: { sortOrder: "asc" },
+      include: {
+        process: true,
+        variables: {
+          orderBy: { sortOrder: "asc" },
+        },
       },
-    },
+    });
+
+    await logAuditEvent({
+      client: transaction,
+      actor: session,
+      action: AuditAction.CREATE,
+      entityType: AuditEntity.INDICATOR,
+      entityId: indicator.id,
+      summary: "Indicador creado.",
+      targetName: `${indicator.code} - ${indicator.name}`,
+      metadata: {
+        processName: indicator.process.name,
+        status: indicator.status,
+        variableNames,
+      },
+      context: getAuditRequestContext(request),
+    });
+
+    return indicator;
   });
 
   return NextResponse.json(
@@ -285,6 +311,57 @@ export async function PATCH(request: NextRequest) {
     );
   }
 
+  const existingIndicator = await prisma.indicator.findUnique({
+    where: { id },
+    include: {
+      process: true,
+      variables: {
+        orderBy: { sortOrder: "asc" },
+      },
+    },
+  });
+
+  if (!existingIndicator) {
+    return NextResponse.json(
+      { message: "El indicador que intentas actualizar no existe." },
+      { status: 404 },
+    );
+  }
+
+  const beforeIndicator = {
+    code: existingIndicator.code,
+    name: existingIndicator.name,
+    processId: existingIndicator.processId,
+    management: existingIndicator.management,
+    evaluator: existingIndicator.evaluator,
+    periodicity: existingIndicator.periodicity,
+    level: existingIndicator.level,
+    unit: existingIndicator.unit,
+    strategy: existingIndicator.strategy ?? null,
+    status: existingIndicator.status,
+    deficientGoal: String(existingIndicator.deficientGoal),
+    acceptableGoal: String(existingIndicator.acceptableGoal),
+    objectiveGoal: String(existingIndicator.objectiveGoal),
+    variableNames: existingIndicator.variables.map((variable) => variable.name),
+  };
+  const afterIndicator = {
+    code,
+    name,
+    processId,
+    management,
+    evaluator,
+    periodicity,
+    level,
+    unit,
+    strategy,
+    status,
+    deficientGoal,
+    acceptableGoal,
+    objectiveGoal,
+    variableNames,
+  };
+  const changedFields = getChangedFields(beforeIndicator, afterIndicator);
+
   const updatedIndicator = await prisma.$transaction(async (transaction) => {
     const indicator = await transaction.indicator.update({
       where: { id },
@@ -338,6 +415,28 @@ export async function PATCH(request: NextRequest) {
           orderBy: { sortOrder: "asc" },
         },
       },
+    });
+
+    await logAuditEvent({
+      client: transaction,
+      actor: session,
+      action: AuditAction.UPDATE,
+      entityType: AuditEntity.INDICATOR,
+      entityId: refreshedIndicator.id,
+      summary: "Indicador actualizado.",
+      targetName: `${refreshedIndicator.code} - ${refreshedIndicator.name}`,
+      metadata: {
+        changedFields,
+        before: {
+          ...beforeIndicator,
+          processName: existingIndicator.process.name,
+        },
+        after: {
+          ...afterIndicator,
+          processName: refreshedIndicator.process.name,
+        },
+      },
+      context: getAuditRequestContext(request),
     });
 
     return refreshedIndicator;

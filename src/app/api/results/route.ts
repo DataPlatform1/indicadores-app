@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AuditAction, AuditEntity } from "@prisma/client";
 import { canSubmit, canViewHistory, getCurrentSession } from "@/lib/auth";
+import { getAuditRequestContext, logAuditEvent } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 
 type ResultPayload = {
@@ -119,36 +121,57 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const created = await prisma.indicatorResult.create({
-    data: {
-      recordNumber: generateRecordNumber(),
-      reportingDate: new Date(body.reportingDate),
-      startDate: new Date(body.startDate),
-      endDate: new Date(body.endDate),
-      periodMonths: Number(body.periodMonths),
-      resultValue: body.result,
-      indicatorPercent: body.indicatorPercentage,
-      compliance: body.compliance,
-      zeroJustification: body.zeroJustification || null,
-      analysis: body.analysis,
-      observation: body.observation || null,
-      indicatorId: body.indicatorId,
-      submittedById: session.userId,
-      submittedByName: session.name,
-      submittedByEmail: session.email,
-      variableValues: {
-        create: indicator.variables.map((variable, index) => ({
-          indicatorVariableId: variable.id,
-          numericValue: body.variableValues[index]
-            ? body.variableValues[index]
-            : null,
-        })),
+  const created = await prisma.$transaction(async (transaction) => {
+    const result = await transaction.indicatorResult.create({
+      data: {
+        recordNumber: generateRecordNumber(),
+        reportingDate: new Date(body.reportingDate),
+        startDate: new Date(body.startDate),
+        endDate: new Date(body.endDate),
+        periodMonths: Number(body.periodMonths),
+        resultValue: body.result,
+        indicatorPercent: body.indicatorPercentage,
+        compliance: body.compliance,
+        zeroJustification: body.zeroJustification || null,
+        analysis: body.analysis,
+        observation: body.observation || null,
+        indicatorId: body.indicatorId,
+        submittedById: session.userId,
+        submittedByName: session.name,
+        submittedByEmail: session.email,
+        variableValues: {
+          create: indicator.variables.map((variable, index) => ({
+            indicatorVariableId: variable.id,
+            numericValue: body.variableValues[index]
+              ? body.variableValues[index]
+              : null,
+          })),
+        },
       },
-    },
-    select: {
-      id: true,
-      recordNumber: true,
-    },
+      select: {
+        id: true,
+        recordNumber: true,
+      },
+    });
+
+    await logAuditEvent({
+      client: transaction,
+      actor: session,
+      action: AuditAction.SUBMIT,
+      entityType: AuditEntity.RESULT,
+      entityId: result.id,
+      summary: "Resultado de indicador registrado.",
+      targetName: indicator.name,
+      metadata: {
+        recordNumber: result.recordNumber,
+        compliance: body.compliance,
+        resultValue: body.result,
+        indicatorPercent: body.indicatorPercentage,
+      },
+      context: getAuditRequestContext(request),
+    });
+
+    return result;
   });
 
   return NextResponse.json(created, { status: 201 });

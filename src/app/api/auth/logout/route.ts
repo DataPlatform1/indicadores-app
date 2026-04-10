@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
-import { sessionCookieName } from "@/lib/auth";
+import { AuditAction, AuditEntity } from "@prisma/client";
+import { getCurrentSession, sessionCookieName } from "@/lib/auth";
+import { logAuditEvent } from "@/lib/audit";
 
 export async function POST() {
+  const session = await getCurrentSession();
   const response = NextResponse.json({ ok: true });
 
   response.cookies.set(sessionCookieName(), "", {
@@ -11,6 +14,17 @@ export async function POST() {
     path: "/",
     maxAge: 0,
   });
+
+  if (session) {
+    await logAuditEvent({
+      actor: session,
+      action: AuditAction.LOGOUT,
+      entityType: AuditEntity.AUTH,
+      entityId: session.userId,
+      summary: "Cierre de sesion.",
+      targetName: session.email,
+    });
+  }
 
   return response;
 }

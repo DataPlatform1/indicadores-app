@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AuditAction, AuditEntity } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   createSessionToken,
   sessionCookieName,
   verifyPassword,
 } from "@/lib/auth";
+import { getAuditRequestContext, logAuditEvent } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as {
@@ -62,6 +64,24 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7,
     },
   );
+
+  await logAuditEvent({
+    actor: {
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+    },
+    action: AuditAction.LOGIN,
+    entityType: AuditEntity.AUTH,
+    entityId: user.id,
+    summary: "Inicio de sesion exitoso.",
+    targetName: user.email,
+    metadata: {
+      userName: user.name,
+    },
+    context: getAuditRequestContext(request),
+  });
 
   return response;
 }

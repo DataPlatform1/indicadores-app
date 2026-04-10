@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { AuditAction, AuditEntity } from "@prisma/client";
 import { getCurrentSession } from "@/lib/auth";
+import {
+  getAuditRequestContext,
+  getChangedFields,
+  logAuditEvent,
+} from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { canManageUsers } from "@/lib/roles";
 import { BRANDING } from "@/lib/branding";
@@ -108,71 +114,89 @@ export async function PATCH(request: NextRequest) {
     }
   }
 
-  const settings = await prisma.brandSettings.upsert({
+  const existingSettings = await prisma.brandSettings.findUnique({
     where: { id: "default" },
-    update: {
-      organizationName: body.organizationName!.trim(),
-      shortName: body.shortName!.trim(),
-      appTitle: body.appTitle!.trim(),
-      appDescription: body.appDescription!.trim(),
-      appEyebrow: body.appEyebrow!.trim(),
-      appSummary: body.appSummary!.trim(),
-      loginBadge: body.loginBadge!.trim(),
-      loginTitle: body.loginTitle!.trim(),
-      loginDescription: body.loginDescription!.trim(),
-      loginSupportTitle: body.loginSupportTitle!.trim(),
-      loginSupportText: body.loginSupportText!.trim(),
-      background: body.background!.trim(),
-      panelBackground: body.panelBackground!.trim(),
-      panelBorder: body.panelBorder!.trim(),
-      mutedSurface: body.mutedSurface!.trim(),
-      primary: body.primary!.trim(),
-      primaryHover: body.primaryHover!.trim(),
-      secondary: body.secondary!.trim(),
-      accent: body.accent!.trim(),
-      accentText: body.accentText!.trim(),
-      text: body.text!.trim(),
-      mutedText: body.mutedText!.trim(),
-      inputBorder: body.inputBorder!.trim(),
-      inputFocus: body.inputFocus!.trim(),
-      inputDisabled: body.inputDisabled!.trim(),
-      cardShadow: body.cardShadow!.trim(),
-      logoText: body.logoText!.trim(),
-      loginImageUrl: body.loginImageUrl?.trim() || null,
-      logoImageUrl: body.logoImageUrl?.trim() || null,
-    },
-    create: {
-      id: "default",
-      organizationName: body.organizationName!.trim(),
-      shortName: body.shortName!.trim(),
-      appTitle: body.appTitle!.trim(),
-      appDescription: body.appDescription!.trim(),
-      appEyebrow: body.appEyebrow!.trim(),
-      appSummary: body.appSummary!.trim(),
-      loginBadge: body.loginBadge!.trim(),
-      loginTitle: body.loginTitle!.trim(),
-      loginDescription: body.loginDescription!.trim(),
-      loginSupportTitle: body.loginSupportTitle!.trim(),
-      loginSupportText: body.loginSupportText!.trim(),
-      background: body.background!.trim(),
-      panelBackground: body.panelBackground!.trim(),
-      panelBorder: body.panelBorder!.trim(),
-      mutedSurface: body.mutedSurface!.trim(),
-      primary: body.primary!.trim(),
-      primaryHover: body.primaryHover!.trim(),
-      secondary: body.secondary!.trim(),
-      accent: body.accent!.trim(),
-      accentText: body.accentText!.trim(),
-      text: body.text!.trim(),
-      mutedText: body.mutedText!.trim(),
-      inputBorder: body.inputBorder!.trim(),
-      inputFocus: body.inputFocus!.trim(),
-      inputDisabled: body.inputDisabled!.trim(),
-      cardShadow: body.cardShadow!.trim(),
-      logoText: body.logoText!.trim(),
-      loginImageUrl: body.loginImageUrl?.trim() || null,
-      logoImageUrl: body.logoImageUrl?.trim() || null,
-    },
+  });
+  const nextSettings = {
+    organizationName: body.organizationName!.trim(),
+    shortName: body.shortName!.trim(),
+    appTitle: body.appTitle!.trim(),
+    appDescription: body.appDescription!.trim(),
+    appEyebrow: body.appEyebrow!.trim(),
+    appSummary: body.appSummary!.trim(),
+    loginBadge: body.loginBadge!.trim(),
+    loginTitle: body.loginTitle!.trim(),
+    loginDescription: body.loginDescription!.trim(),
+    loginSupportTitle: body.loginSupportTitle!.trim(),
+    loginSupportText: body.loginSupportText!.trim(),
+    background: body.background!.trim(),
+    panelBackground: body.panelBackground!.trim(),
+    panelBorder: body.panelBorder!.trim(),
+    mutedSurface: body.mutedSurface!.trim(),
+    primary: body.primary!.trim(),
+    primaryHover: body.primaryHover!.trim(),
+    secondary: body.secondary!.trim(),
+    accent: body.accent!.trim(),
+    accentText: body.accentText!.trim(),
+    text: body.text!.trim(),
+    mutedText: body.mutedText!.trim(),
+    inputBorder: body.inputBorder!.trim(),
+    inputFocus: body.inputFocus!.trim(),
+    inputDisabled: body.inputDisabled!.trim(),
+    cardShadow: body.cardShadow!.trim(),
+    logoText: body.logoText!.trim(),
+    loginImageUrl: body.loginImageUrl?.trim() || null,
+    logoImageUrl: body.logoImageUrl?.trim() || null,
+  };
+  const changedFields = getChangedFields(existingSettings ?? {}, nextSettings);
+
+  const settings = await prisma.$transaction(async (transaction) => {
+    const savedSettings = await transaction.brandSettings.upsert({
+      where: { id: "default" },
+      update: nextSettings,
+      create: {
+        id: "default",
+        ...nextSettings,
+      },
+    });
+
+    await logAuditEvent({
+      client: transaction,
+      actor: session,
+      action: existingSettings ? AuditAction.UPDATE : AuditAction.CREATE,
+      entityType: AuditEntity.BRANDING,
+      entityId: savedSettings.id,
+      summary: existingSettings
+        ? "Configuracion visual actualizada."
+        : "Configuracion visual creada.",
+      targetName: savedSettings.organizationName,
+      metadata: {
+        changedFields,
+        before: existingSettings
+          ? {
+              organizationName: existingSettings.organizationName,
+              shortName: existingSettings.shortName,
+              appTitle: existingSettings.appTitle,
+              loginTitle: existingSettings.loginTitle,
+              loginBadge: existingSettings.loginBadge,
+              primary: existingSettings.primary,
+              secondary: existingSettings.secondary,
+            }
+          : null,
+        after: {
+          organizationName: nextSettings.organizationName,
+          shortName: nextSettings.shortName,
+          appTitle: nextSettings.appTitle,
+          loginTitle: nextSettings.loginTitle,
+          loginBadge: nextSettings.loginBadge,
+          primary: nextSettings.primary,
+          secondary: nextSettings.secondary,
+        },
+      },
+      context: getAuditRequestContext(request),
+    });
+
+    return savedSettings;
   });
 
   return NextResponse.json({ settings });
