@@ -7,7 +7,7 @@ export const BRANDING = {
   appSummary:
     "Aplicacion para administrar usuarios, indicadores y resultados del tablero de mando.",
   loginBadge: "Acceso al sistema",
-  loginTitle: "Inicia sesion para acceder el formulario de indicadores",
+  loginTitle: "App formulario indicadores",
   loginDescription:
     "Esta pantalla esta separada del formulario para que el acceso sea mas claro y profesional.",
   loginSupportTitle: "Configuracion visual centralizada",
