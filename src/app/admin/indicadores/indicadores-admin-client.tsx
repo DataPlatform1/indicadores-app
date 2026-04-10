@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
+import AdminNavigation from "@/app/_components/admin-navigation";
 
 type ProcessOption = {
   id: string;
@@ -182,43 +182,11 @@ export default function IndicadoresAdminClient() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#dff4ff_0%,#f7fbff_45%,#eef4e8_100%)] px-4 py-8 text-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <section className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-semibold text-teal-900">
-                Panel administrativo
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
-                Gestion de indicadores
-              </h1>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Aqui puedes crear, editar y desactivar indicadores. Los inactivos ya no
-                aparecen en el formulario.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-                href="/admin/usuarios"
-              >
-                Administrar usuarios
-              </Link>
-              <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-                href="/admin/auditoria"
-              >
-                Ver auditoria
-              </Link>
-              <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-                href="/formulario"
-              >
-                Volver al formulario
-              </Link>
-            </div>
-          </div>
-        </section>
+        <AdminNavigation
+          currentPath="/admin/indicadores"
+          title="Gestion de indicadores"
+          description="Administra metas, variables y estado de cada indicador desde una navegacion central mas clara."
+        />
 
         <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <section className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">

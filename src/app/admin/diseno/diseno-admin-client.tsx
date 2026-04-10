@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Link from "next/link";
+import AdminNavigation from "@/app/_components/admin-navigation";
 
 type BrandingForm = {
   organizationName: string;
@@ -221,32 +221,11 @@ export default function DisenoAdminClient() {
   return (
     <main className="brand-page px-4 py-8 text-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <section className="brand-panel rounded-[2rem] p-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="brand-badge">Panel administrativo</p>
-              <h1 className="brand-title mt-4 text-4xl font-semibold tracking-tight">
-                Gestion de diseno
-              </h1>
-              <p className="brand-copy mt-2 max-w-3xl text-sm leading-6">
-                Desde aqui puedes cambiar nombre institucional, textos del login,
-                colores principales y recursos visuales sin tocar el codigo.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/admin/indicadores">
-                Administrar indicadores
-              </Link>
-              <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/admin/auditoria">
-                Ver auditoria
-              </Link>
-              <Link className="brand-button-secondary px-4 py-2 text-sm font-medium" href="/formulario">
-                Volver al formulario
-              </Link>
-            </div>
-          </div>
-        </section>
+        <AdminNavigation
+          currentPath="/admin/diseno"
+          title="Gestion de diseno"
+          description="Cambia identidad visual, textos y branding desde un panel mas limpio y conectado con el resto del admin."
+        />
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <form className="brand-panel rounded-[2rem] p-6" onSubmit={handleSubmit}>

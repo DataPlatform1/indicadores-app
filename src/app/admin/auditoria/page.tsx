@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { AuditAction, AuditEntity, Prisma } from "@prisma/client";
 import { redirect } from "next/navigation";
+import AdminNavigation from "@/app/_components/admin-navigation";
 import { getCurrentSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { canManageUsers } from "@/lib/roles";
@@ -105,43 +105,11 @@ export default async function AdminAuditoriaPage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#dff4ff_0%,#f7fbff_45%,#eef4e8_100%)] px-4 py-8 text-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <section className="rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-semibold text-teal-900">
-                Panel administrativo
-              </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950">
-                Auditoria y trazabilidad
-              </h1>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Aqui puedes ver quien hizo cambios, en que modulo, cuando ocurrio
-                y sobre que elemento del sistema.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-                href="/admin/usuarios"
-              >
-                Administrar usuarios
-              </Link>
-              <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-                href="/admin/indicadores"
-              >
-                Administrar indicadores
-              </Link>
-              <Link
-                className="rounded-full border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50"
-                href="/admin/diseno"
-              >
-                Gestion de diseno
-              </Link>
-            </div>
-          </div>
-        </section>
+        <AdminNavigation
+          currentPath="/admin/auditoria"
+          title="Auditoria y trazabilidad"
+          description="Consulta accesos, cambios y movimientos clave del sistema desde una vista centralizada."
+        />
 
         <section className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
           <div className="flex flex-wrap items-center justify-between gap-3">
