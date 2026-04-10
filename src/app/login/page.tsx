@@ -238,134 +238,212 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="brand-page px-4 py-8">
-      <div className="mx-auto grid min-h-[80vh] w-full max-w-6xl items-center gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <section className="brand-panel rounded-[2rem] p-8">
-          <div className="flex flex-wrap items-center gap-4">
-            {branding.assets.logoImageUrl ? (
-              <img
-                alt={`${branding.organizationName} logo`}
-                className="h-14 w-14 rounded-full object-cover shadow-[0_16px_32px_rgba(15,23,42,0.18)]"
-                src={branding.assets.logoImageUrl}
-              />
-            ) : (
-              <span className="brand-logo-mark">
-                {branding.assets.logoText || branding.shortName}
-              </span>
-            )}
-            <div className="space-y-1">
-              <p className="brand-kicker">{branding.appEyebrow}</p>
-              <p className="text-sm font-semibold text-slate-700">
-                {branding.organizationName}
-              </p>
-            </div>
-          </div>
+    <main className="brand-page login-shell px-4 py-8 lg:px-6">
+      <div className="login-grid mx-auto grid min-h-[88vh] w-full max-w-7xl items-center gap-6 lg:grid-cols-[1.18fr_0.82fr]">
+        <section className="brand-panel login-hero rounded-[2.25rem] p-8 lg:p-10">
+          <div className="login-hero-mesh" />
 
-          <p className="brand-badge mt-6">{branding.loginBadge}</p>
-          <h1 className="brand-title mt-5 max-w-3xl text-4xl font-semibold tracking-tight">
-            {branding.loginTitle}
-          </h1>
-          <p className="brand-copy mt-4 max-w-2xl text-base leading-7">
-            {branding.loginDescription}
-          </p>
-
-          <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_0.92fr]">
-            <div className="brand-panel-soft rounded-[1.75rem] p-6">
-              <p className="brand-kicker">{branding.loginSupportTitle}</p>
-              <p className="brand-copy mt-3 text-sm leading-7">
-                {branding.loginSupportText}
-              </p>
-              <div className="mt-5 grid gap-3 text-sm text-slate-700 md:grid-cols-2">
-                <div className="rounded-[1.25rem] bg-white/80 p-4">
-                  <p className="brand-kicker">Donde se cambia</p>
-                  <p className="mt-2 font-semibold text-slate-900">
-                    Panel administrativo de diseno
-                  </p>
-                </div>
-                <div className="rounded-[1.25rem] bg-white/80 p-4">
-                  <p className="brand-kicker">Que controlas</p>
-                  <p className="mt-2 font-semibold text-slate-900">
-                    colores, textos, imagenes y logo
+          <div className="relative z-10">
+            <div className="login-kicker-row">
+              <div className="login-identity">
+                {branding.assets.logoImageUrl ? (
+                  <img
+                    alt={`${branding.organizationName} logo`}
+                    className="h-16 w-16 rounded-[1.4rem] object-cover shadow-[0_18px_38px_rgba(15,23,42,0.16)]"
+                    src={branding.assets.logoImageUrl}
+                  />
+                ) : (
+                  <span className="brand-logo-mark h-16 w-16 rounded-[1.4rem] text-lg">
+                    {branding.assets.logoText || branding.shortName}
+                  </span>
+                )}
+                <div className="space-y-1">
+                  <p className="brand-kicker">{branding.appEyebrow}</p>
+                  <p className="text-lg font-semibold text-slate-800">
+                    {branding.organizationName}
                   </p>
                 </div>
               </div>
+
+              <span className="brand-badge">{branding.loginBadge}</span>
             </div>
 
-            {branding.assets.loginImageUrl ? (
-              <div className="brand-panel-soft overflow-hidden rounded-[1.75rem] p-3">
-                <img
-                  alt={`${branding.organizationName} portada`}
-                  className="h-full min-h-64 w-full rounded-[1.25rem] object-cover"
-                  src={branding.assets.loginImageUrl}
-                />
-              </div>
-            ) : (
-              <div className="brand-panel-soft rounded-[1.75rem] p-6">
-                <p className="brand-kicker">Vista institucional</p>
-                <h3 className="brand-title mt-3 text-2xl font-semibold">
-                  {branding.appTitle}
-                </h3>
-                <p className="brand-copy mt-3 text-sm leading-7">
-                  {branding.appSummary}
+            <div className="mt-8 max-w-4xl">
+              <h1 className="brand-title max-w-4xl text-5xl font-semibold leading-[1.02] tracking-[-0.03em] lg:text-6xl">
+                {branding.loginTitle}
+              </h1>
+              <p className="brand-copy mt-5 max-w-2xl text-lg leading-8">
+                {branding.loginDescription}
+              </p>
+            </div>
+
+            <div className="login-stat-grid mt-8">
+              <StatCard label="Experiencia" value="Acceso claro" />
+              <StatCard label="Gestion" value="Roles y control" />
+              <StatCard label="Trazabilidad" value="Listo para auditoria" />
+            </div>
+
+            <div className="login-feature-grid mt-8">
+              <div className="login-feature-card">
+                <p className="brand-kicker">{branding.loginSupportTitle}</p>
+                <p className="brand-copy mt-4 text-sm leading-7">
+                  {branding.loginSupportText}
                 </p>
+
+                <div className="login-mini-grid mt-6">
+                  <div className="login-mini-card">
+                    <p className="brand-kicker">Direccion visual</p>
+                    <p className="mt-3 text-base font-semibold text-slate-900">
+                      Identidad institucional con mejor jerarquia y menos sensacion
+                      de plantilla.
+                    </p>
+                  </div>
+                  <div className="login-mini-card">
+                    <p className="brand-kicker">Control central</p>
+                    <p className="mt-3 text-base font-semibold text-slate-900">
+                      Textos, colores y recursos visuales se pueden administrar sin
+                      rehacer la app.
+                    </p>
+                  </div>
+                </div>
               </div>
-            )}
+
+              {branding.assets.loginImageUrl ? (
+                <div className="login-feature-card overflow-hidden p-3">
+                  <img
+                    alt={`${branding.organizationName} portada`}
+                    className="h-full min-h-72 w-full rounded-[1.3rem] object-cover"
+                    src={branding.assets.loginImageUrl}
+                  />
+                </div>
+              ) : (
+                <div className="login-feature-card dark">
+                  <p className="brand-kicker text-cyan-300">Vista institucional</p>
+                  <h3 className="brand-title mt-4 text-3xl font-semibold text-white">
+                    {branding.appTitle}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-slate-300">
+                    {branding.appSummary}
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    <span className="rounded-full bg-white/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-200">
+                      Next.js
+                    </span>
+                    <span className="rounded-full bg-white/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-200">
+                      Prisma
+                    </span>
+                    <span className="rounded-full bg-white/8 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-200">
+                      PostgreSQL
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
-        <section className="brand-panel rounded-[2rem] p-8">
-          <h2 className="brand-title text-2xl font-semibold">Ingresar</h2>
-          <p className="brand-copy mt-2 text-sm">
-            Usa tu correo y contrasena para acceder.
-          </p>
+        <section className="brand-panel login-card rounded-[2.25rem] p-8 lg:p-10">
+          <div className="login-card-inner">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="brand-kicker">Acceso seguro</p>
+                <h2 className="brand-title mt-3 text-3xl font-semibold">
+                  Ingresar al sistema
+                </h2>
+                <p className="brand-copy mt-3 max-w-md text-sm leading-7">
+                  Usa tu correo y contrasena para continuar al formulario y a los
+                  modulos segun tu rol.
+                </p>
+              </div>
 
-          <form className="mt-6 grid gap-4" onSubmit={handleLogin}>
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
-              <span>Correo</span>
-              <input
-                className="field"
-                type="email"
-                value={loginForm.email}
-                onChange={(event) =>
-                  setLoginForm((current) => ({
-                    ...current,
-                    email: event.target.value,
-                  }))
-                }
-                required
-              />
-            </label>
+              <div className="login-secure-note">
+                <span className="login-secure-dot" />
+                <span className="text-xs font-semibold uppercase tracking-[0.18em]">
+                  Sesion institucional
+                </span>
+              </div>
+            </div>
 
-            <label className="grid gap-2 text-sm font-medium text-slate-700">
-              <span>Contrasena</span>
-              <input
-                className="field"
-                type="password"
-                value={loginForm.password}
-                onChange={(event) =>
-                  setLoginForm((current) => ({
-                    ...current,
-                    password: event.target.value,
-                  }))
-                }
-                required
-              />
-            </label>
+            <div className="login-form-divider my-7" />
 
-            {loginError ? (
-              <p className="text-sm text-rose-600">{loginError}</p>
-            ) : null}
+            <form className="grid gap-5" onSubmit={handleLogin}>
+              <label className="grid gap-2 text-sm font-medium text-slate-700">
+                <span>Correo</span>
+                <input
+                  className="field"
+                  type="email"
+                  value={loginForm.email}
+                  onChange={(event) =>
+                    setLoginForm((current) => ({
+                      ...current,
+                      email: event.target.value,
+                    }))
+                  }
+                  required
+                />
+              </label>
 
-            <button
-              className="brand-button-primary px-6 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:bg-slate-400"
-              disabled={isLoggingIn}
-              type="submit"
-            >
-              {isLoggingIn ? "Ingresando..." : "Iniciar sesion"}
-            </button>
-          </form>
+              <label className="grid gap-2 text-sm font-medium text-slate-700">
+                <span>Contrasena</span>
+                <input
+                  className="field"
+                  type="password"
+                  value={loginForm.password}
+                  onChange={(event) =>
+                    setLoginForm((current) => ({
+                      ...current,
+                      password: event.target.value,
+                    }))
+                  }
+                  required
+                />
+              </label>
+
+              {loginError ? (
+                <div className="rounded-[1.2rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                  {loginError}
+                </div>
+              ) : null}
+
+              <button
+                className="brand-button-primary mt-2 px-6 py-3.5 text-sm font-semibold disabled:cursor-not-allowed disabled:bg-slate-400"
+                disabled={isLoggingIn}
+                type="submit"
+              >
+                {isLoggingIn ? "Ingresando..." : "Iniciar sesion"}
+              </button>
+            </form>
+
+            <div className="login-form-divider my-7" />
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-[1.4rem] bg-white/80 p-4 ring-1 ring-slate-200/80">
+                <p className="brand-kicker">Acceso por rol</p>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  Los permisos de captura, historial y administracion cambian segun el
+                  perfil del usuario.
+                </p>
+              </div>
+              <div className="rounded-[1.4rem] bg-white/80 p-4 ring-1 ring-slate-200/80">
+                <p className="brand-kicker">Entorno productivo</p>
+                <p className="mt-3 text-sm leading-7 text-slate-600">
+                  La app opera sobre PostgreSQL y mantiene trazabilidad en los modulos
+                  administrativos.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </main>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="login-stat-card">
+      <p className="login-stat-label">{label}</p>
+      <p className="login-stat-value">{value}</p>
+    </div>
   );
 }
