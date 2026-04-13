@@ -12,6 +12,8 @@ const justifications = [
   "Falta de gestion",
 ];
 
+const MAX_VARIABLES = 4;
+
 type IndicatorTemplate = {
   id: string;
   code: string;
@@ -73,7 +75,7 @@ const initialFormValues: FormValues = {
   startDate: "",
   endDate: "",
   periodMonths: "",
-  variableValues: Array.from({ length: 8 }, () => ""),
+  variableValues: Array.from({ length: MAX_VARIABLES }, () => ""),
   result: "",
   indicatorPercentage: "",
   compliance: "",
@@ -182,10 +184,55 @@ export default function FormularioIndicadores() {
   const selectedIndicator = indicatorTemplates.find(
     (indicator) => indicator.id === formValues.indicatorId,
   );
+  const visibleVariableNames = Array.from(
+    { length: MAX_VARIABLES },
+    (_, index) => selectedIndicator?.variableNames[index] ?? `Variable ${index + 1}`,
+  );
 
   const canCurrentUserSubmit = canSubmit(sessionUser?.role);
   const canCurrentUserViewHistory = canViewHistory(sessionUser?.role);
   const canCurrentUserManageUsers = canManageUsers(sessionUser?.role);
+  const dateRangeError =
+    formValues.startDate &&
+    formValues.endDate &&
+    new Date(formValues.startDate) > new Date(formValues.endDate)
+      ? "La fecha de inicio no puede ser mayor a la fecha de fin."
+      : null;
+
+  useEffect(() => {
+    setFormValues((current) => {
+      const nextPeriodMonths = calculatePeriodMonths(
+        current.startDate,
+        current.endDate,
+      );
+      const nextResult = calculateIndicatorResult(
+        selectedIndicator?.variableNames ?? [],
+        current.variableValues,
+      );
+      const nextResultValue = nextResult === null ? "" : formatNumber(nextResult);
+      const nextCompliance =
+        nextResult === null || !selectedIndicator
+          ? ""
+          : calculateCompliance(nextResult, selectedIndicator);
+
+      if (
+        current.periodMonths === nextPeriodMonths &&
+        current.result === nextResultValue &&
+        current.indicatorPercentage === nextResultValue &&
+        current.compliance === nextCompliance
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        periodMonths: nextPeriodMonths,
+        result: nextResultValue,
+        indicatorPercentage: nextResultValue,
+        compliance: nextCompliance,
+      };
+    });
+  }, [selectedIndicator, formValues.startDate, formValues.endDate, formValues.variableValues]);
 
   function updateField<K extends keyof FormValues>(field: K, value: FormValues[K]) {
     setFormValues((current) => ({ ...current, [field]: value }));
@@ -201,6 +248,18 @@ export default function FormularioIndicadores() {
         variableValues: nextValues,
       };
     });
+  }
+
+  function handleIndicatorChange(indicatorId: string) {
+    setFormValues((current) => ({
+      ...current,
+      indicatorId,
+      variableValues: Array.from({ length: MAX_VARIABLES }, () => ""),
+      result: "",
+      indicatorPercentage: "",
+      compliance: "",
+      zeroJustification: "N/A",
+    }));
   }
 
   function resetForm() {
@@ -222,6 +281,10 @@ export default function FormularioIndicadores() {
     setFeedback(null);
 
     try {
+      if (dateRangeError) {
+        throw new Error(dateRangeError);
+      }
+
       const response = await fetch("/api/results", {
         method: "POST",
         headers: {
@@ -272,21 +335,20 @@ export default function FormularioIndicadores() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#dff4ff_0%,#f7fbff_45%,#eef4e8_100%)] px-4 py-8 text-slate-900">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <section className="grid gap-4 rounded-[2rem] border border-white/70 bg-white/85 p-6 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur md:grid-cols-[1.2fr_0.8fr]">
+        <section className="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-[0_30px_80px_rgba(20,38,62,0.12)] backdrop-blur">
           <div className="space-y-4">
             <p className="inline-flex rounded-full bg-teal-100 px-4 py-1 text-sm font-semibold text-teal-900">
               Formulario de indicadores
             </p>
-            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-slate-950">
-              Registro de resultados del tablero de mando
+            <h1 className="max-w-4xl text-5xl font-semibold tracking-tight text-slate-950 md:text-6xl">
+              Formulario Indicadores
             </h1>
-            <p className="max-w-3xl text-base leading-7 text-slate-600">
-              Esta pantalla esta separada del login y solo permite el registro a los roles
-              autorizados.
+            <p className="max-w-3xl text-sm leading-7 text-slate-600">
+              {sessionUser.email} Â· Rol: {sessionUser.role}
             </p>
           </div>
 
-          <div className="grid gap-3 rounded-[1.5rem] bg-slate-950 p-5 text-slate-50">
+          <div className="hidden gap-3 rounded-[1.5rem] bg-slate-950 p-5 text-slate-50">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">
               Usuario actual
             </p>
@@ -302,9 +364,9 @@ export default function FormularioIndicadores() {
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
+        <section className="rounded-[2rem] border border-white/70 bg-white p-4 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
+            <div className="hidden">
               <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
                 Sesion iniciada
               </p>
@@ -373,7 +435,7 @@ export default function FormularioIndicadores() {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
+        <section>
           <form
             className="space-y-6 rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]"
             onSubmit={handleSubmit}
@@ -431,7 +493,7 @@ export default function FormularioIndicadores() {
                 <select
                   className="field"
                   value={formValues.indicatorId}
-                  onChange={(event) => updateField("indicatorId", event.target.value)}
+                  onChange={(event) => handleIndicatorChange(event.target.value)}
                   required
                   disabled={!formValues.process || isLoadingTemplate || !canCurrentUserSubmit}
                 >
@@ -477,6 +539,7 @@ export default function FormularioIndicadores() {
                     type="date"
                     value={formValues.startDate}
                     onChange={(event) => updateField("startDate", event.target.value)}
+                    max={formValues.endDate || undefined}
                     required
                     disabled={!canCurrentUserSubmit}
                   />
@@ -488,6 +551,7 @@ export default function FormularioIndicadores() {
                     type="date"
                     value={formValues.endDate}
                     onChange={(event) => updateField("endDate", event.target.value)}
+                    min={formValues.startDate || undefined}
                     required
                     disabled={!canCurrentUserSubmit}
                   />
@@ -497,14 +561,19 @@ export default function FormularioIndicadores() {
                   <input
                     className="field"
                     type="number"
-                    min="1"
+                    min="0"
                     value={formValues.periodMonths}
-                    onChange={(event) => updateField("periodMonths", event.target.value)}
+                    readOnly
                     required
-                    disabled={!canCurrentUserSubmit}
+                    disabled={!canCurrentUserSubmit || !formValues.startDate || !formValues.endDate}
                   />
                 </Field>
               </div>
+              {dateRangeError ? (
+                <p className="mt-3 text-sm font-medium text-rose-600">
+                  {dateRangeError}
+                </p>
+              ) : null}
             </div>
 
             <div className="rounded-[1.5rem] bg-slate-950 p-5 text-slate-50">
@@ -525,10 +594,7 @@ export default function FormularioIndicadores() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                {Array.from({ length: 8 }, (_, index) => {
-                  const label =
-                    selectedIndicator?.variableNames[index] ?? `Variable ${index + 1}`;
-
+                {visibleVariableNames.map((label, index) => {
                   return (
                     <Field key={label} label={label}>
                       <input
@@ -538,7 +604,7 @@ export default function FormularioIndicadores() {
                         placeholder={`Ingresa ${label.toLowerCase()}`}
                         value={formValues.variableValues[index]}
                         onChange={(event) => updateVariableValue(index, event.target.value)}
-                        disabled={!canCurrentUserSubmit}
+                        disabled={!canCurrentUserSubmit || !selectedIndicator}
                       />
                     </Field>
                   );
@@ -553,9 +619,9 @@ export default function FormularioIndicadores() {
                   type="number"
                   step="0.01"
                   value={formValues.result}
-                  onChange={(event) => updateField("result", event.target.value)}
+                  readOnly
                   required
-                  disabled={!canCurrentUserSubmit}
+                  disabled={!canCurrentUserSubmit || !selectedIndicator}
                 />
               </Field>
 
@@ -565,41 +631,39 @@ export default function FormularioIndicadores() {
                   type="number"
                   step="0.01"
                   value={formValues.indicatorPercentage}
-                  onChange={(event) => updateField("indicatorPercentage", event.target.value)}
+                  readOnly
                   required
-                  disabled={!canCurrentUserSubmit}
+                  disabled={!canCurrentUserSubmit || !selectedIndicator}
                 />
               </Field>
 
               <Field label="Cumple" required>
-                <select
+                <input
                   className="field"
                   value={formValues.compliance}
-                  onChange={(event) => updateField("compliance", event.target.value)}
+                  readOnly
                   required
-                  disabled={!canCurrentUserSubmit}
-                >
-                  <option value="">Selecciona una opcion</option>
-                  <option value="Si">Si</option>
-                  <option value="No">No</option>
-                  <option value="Parcial">Parcial</option>
-                </select>
+                  disabled={!canCurrentUserSubmit || !selectedIndicator}
+                  placeholder="Se calcula con las metas configuradas"
+                />
               </Field>
 
-              <Field label="Justificacion variables en 0">
-                <select
-                  className="field"
-                  value={formValues.zeroJustification}
-                  onChange={(event) => updateField("zeroJustification", event.target.value)}
-                  disabled={!canCurrentUserSubmit}
-                >
-                  {justifications.map((justification) => (
-                    <option key={justification} value={justification}>
-                      {justification}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+              <div className="hidden">
+                <Field label="Justificacion variables en 0">
+                  <select
+                    className="field"
+                    value={formValues.zeroJustification}
+                    onChange={(event) => updateField("zeroJustification", event.target.value)}
+                    disabled={!canCurrentUserSubmit}
+                  >
+                    {justifications.map((justification) => (
+                      <option key={justification} value={justification}>
+                        {justification}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
             </div>
 
             <div className="grid gap-4">
@@ -639,7 +703,7 @@ export default function FormularioIndicadores() {
             </div>
           </form>
 
-          <aside className="space-y-6">
+          <aside className="hidden">
             <section className="rounded-[2rem] border border-cyan-200 bg-cyan-50 p-6 shadow-[0_16px_40px_rgba(21,94,117,0.10)]">
               <p className="text-sm font-semibold uppercase tracking-[0.18em] text-cyan-900">
                 Flujo actual
@@ -685,7 +749,7 @@ export default function FormularioIndicadores() {
         </section>
 
         {canCurrentUserViewHistory ? (
-          <section className="rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
+          <section className="hidden rounded-[2rem] border border-white/70 bg-white p-6 shadow-[0_20px_60px_rgba(25,50,80,0.08)]">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-2xl font-semibold text-slate-950">Registros recientes</h2>
@@ -791,6 +855,138 @@ function GoalCard({
       <p className="mt-2 text-3xl font-semibold text-white">{value ?? "--"}</p>
     </div>
   );
+}
+
+function parseNumericValue(value: string | undefined) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function safeDivide(numerator: number, denominator: number) {
+  if (!Number.isFinite(denominator) || denominator === 0) {
+    return null;
+  }
+
+  return numerator / denominator;
+}
+
+function formatNumber(value: number) {
+  return String(Math.round(value * 100) / 100);
+}
+
+function calculatePeriodMonths(startDate: string, endDate: string) {
+  if (!startDate || !endDate) {
+    return "";
+  }
+
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) {
+    return "";
+  }
+
+  let months =
+    (end.getFullYear() - start.getFullYear()) * 12 +
+    (end.getMonth() - start.getMonth());
+
+  if (end.getDate() < start.getDate()) {
+    months -= 1;
+  }
+
+  return String(Math.max(months, 0));
+}
+
+function findVariableValue(
+  variableNames: string[],
+  values: (number | null)[],
+  patterns: string[],
+) {
+  const index = variableNames.findIndex((name) => {
+    const normalized = name.toLowerCase();
+    return patterns.some((pattern) => normalized.includes(pattern));
+  });
+
+  return index >= 0 ? values[index] : null;
+}
+
+function calculateIndicatorResult(variableNames: string[], variableValues: string[]) {
+  const names = variableNames.slice(0, MAX_VARIABLES);
+  const values = variableValues
+    .slice(0, MAX_VARIABLES)
+    .map((value) => parseNumericValue(value));
+  const filledValues = values.filter((value): value is number => value !== null);
+
+  if (filledValues.length === 0) {
+    return null;
+  }
+
+  const ingresos = findVariableValue(names, values, ["ingreso", "venta"]);
+  const costos = findVariableValue(names, values, ["costo"]);
+
+  if (ingresos !== null && costos !== null) {
+    const margin = safeDivide(ingresos - costos, ingresos);
+    return margin === null ? null : margin * 100;
+  }
+
+  const programadas = findVariableValue(names, values, ["programad", "planificad"]);
+  const ejecutadas = findVariableValue(names, values, ["ejecutad", "realizad", "cerrad"]);
+
+  if (programadas !== null && ejecutadas !== null) {
+    const ratio = safeDivide(ejecutadas, programadas);
+    return ratio === null ? null : ratio * 100;
+  }
+
+  const propuestas = findVariableValue(names, values, ["propuesta"]);
+  const negocios = findVariableValue(names, values, ["negocio", "cierre", "cerrad"]);
+
+  if (propuestas !== null && negocios !== null) {
+    const conversion = safeDivide(negocios, propuestas);
+    return conversion === null ? null : conversion * 100;
+  }
+
+  const first = values[0];
+  const second = values[1];
+
+  if (filledValues.length >= 2 && first !== null && second !== null) {
+    const ratio = safeDivide(second, first);
+    return ratio === null ? null : ratio * 100;
+  }
+
+  return filledValues[0];
+}
+
+function calculateCompliance(result: number, indicator: IndicatorTemplate) {
+  const deficient = indicator.deficientGoal;
+  const acceptable = indicator.acceptableGoal;
+  const objective = indicator.objectiveGoal;
+  const lowerIsBetter = objective <= acceptable && acceptable <= deficient;
+
+  if (lowerIsBetter) {
+    if (result <= objective) {
+      return "Objetiva";
+    }
+
+    if (result <= acceptable) {
+      return "Aceptable";
+    }
+
+    return "Deficiente";
+  }
+
+  if (result >= objective) {
+    return "Objetiva";
+  }
+
+  if (result >= acceptable) {
+    return "Aceptable";
+  }
+
+  return "Deficiente";
 }
 
 function StatCard({ label, value }: { label: string; value: string }) {

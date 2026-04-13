@@ -72,10 +72,6 @@ const indicatorTemplates = [
       "Capacitaciones ejecutadas",
       "Colaboradores convocados",
       "Colaboradores asistentes",
-      "Horas planificadas",
-      "Horas ejecutadas",
-      "Presupuesto asignado",
-      "Presupuesto ejecutado",
     ],
   },
   {
@@ -98,10 +94,6 @@ const indicatorTemplates = [
       "Actividades ejecutadas",
       "Incidencias registradas",
       "Incidencias resueltas",
-      "Equipos disponibles",
-      "Equipos intervenidos",
-      "OT planificadas",
-      "OT cerradas",
     ],
   },
   {
@@ -124,10 +116,6 @@ const indicatorTemplates = [
       "Propuestas enviadas",
       "Negocios cerrados",
       "Clientes nuevos",
-      "Ingresos proyectados",
-      "Ingresos reales",
-      "Seguimientos realizados",
-      "Seguimientos efectivos",
     ],
   },
 ];

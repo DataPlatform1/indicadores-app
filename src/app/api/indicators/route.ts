@@ -27,8 +27,10 @@ type IndicatorPayload = {
   variableNames?: string[];
 };
 
+const MAX_VARIABLES = 4;
+
 function normalizeVariables(variableNames: string[] | undefined) {
-  return Array.from({ length: 8 }, (_, index) => {
+  return Array.from({ length: MAX_VARIABLES }, (_, index) => {
     const providedName = variableNames?.[index]?.trim();
     return providedName || `Variable ${index + 1}`;
   });
@@ -92,7 +94,7 @@ export async function GET() {
       deficientGoal: Number(indicator.deficientGoal),
       acceptableGoal: Number(indicator.acceptableGoal),
       objectiveGoal: Number(indicator.objectiveGoal),
-      variableNames: indicator.variables.map((variable) => variable.name),
+      variableNames: indicator.variables.slice(0, MAX_VARIABLES).map((variable) => variable.name),
       createdAt: indicator.createdAt.toISOString(),
       updatedAt: indicator.updatedAt.toISOString(),
     })),
@@ -231,7 +233,9 @@ export async function POST(request: NextRequest) {
         deficientGoal: Number(createdIndicator.deficientGoal),
         acceptableGoal: Number(createdIndicator.acceptableGoal),
         objectiveGoal: Number(createdIndicator.objectiveGoal),
-        variableNames: createdIndicator.variables.map((variable) => variable.name),
+        variableNames: createdIndicator.variables
+          .slice(0, MAX_VARIABLES)
+          .map((variable) => variable.name),
         createdAt: createdIndicator.createdAt.toISOString(),
         updatedAt: createdIndicator.updatedAt.toISOString(),
       },
@@ -407,6 +411,15 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    await transaction.indicatorVariable.deleteMany({
+      where: {
+        indicatorId: id,
+        sortOrder: {
+          gt: MAX_VARIABLES,
+        },
+      },
+    });
+
     const refreshedIndicator = await transaction.indicator.findUniqueOrThrow({
       where: { id },
       include: {
@@ -459,7 +472,9 @@ export async function PATCH(request: NextRequest) {
       deficientGoal: Number(updatedIndicator.deficientGoal),
       acceptableGoal: Number(updatedIndicator.acceptableGoal),
       objectiveGoal: Number(updatedIndicator.objectiveGoal),
-      variableNames: updatedIndicator.variables.map((variable) => variable.name),
+      variableNames: updatedIndicator.variables
+        .slice(0, MAX_VARIABLES)
+        .map((variable) => variable.name),
       createdAt: updatedIndicator.createdAt.toISOString(),
       updatedAt: updatedIndicator.updatedAt.toISOString(),
     },

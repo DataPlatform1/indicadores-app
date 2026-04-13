@@ -28,6 +28,8 @@ type IndicatorSummary = {
   updatedAt: string;
 };
 
+const MAX_VARIABLES = 4;
+
 const emptyForm = {
   code: "",
   name: "",
@@ -42,7 +44,7 @@ const emptyForm = {
   deficientGoal: "",
   acceptableGoal: "",
   objectiveGoal: "",
-  variableNames: Array.from({ length: 8 }, (_, index) => `Variable ${index + 1}`),
+  variableNames: Array.from({ length: MAX_VARIABLES }, (_, index) => `Variable ${index + 1}`),
 };
 
 export default function IndicadoresAdminClient() {
@@ -116,7 +118,10 @@ export default function IndicadoresAdminClient() {
       deficientGoal: String(indicator.deficientGoal),
       acceptableGoal: String(indicator.acceptableGoal),
       objectiveGoal: String(indicator.objectiveGoal),
-      variableNames: Array.from({ length: 8 }, (_, index) => indicator.variableNames[index] || `Variable ${index + 1}`),
+      variableNames: Array.from(
+        { length: MAX_VARIABLES },
+        (_, index) => indicator.variableNames[index] || `Variable ${index + 1}`,
+      ),
     });
     setMessage(null);
     setError(null);

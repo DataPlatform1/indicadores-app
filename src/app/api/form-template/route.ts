@@ -40,8 +40,8 @@ export async function GET() {
       deficientGoal: Number(indicator.deficientGoal),
       acceptableGoal: Number(indicator.acceptableGoal),
       objectiveGoal: Number(indicator.objectiveGoal),
-      variableNames: indicator.variables.map((variable) => variable.name),
-      variableIds: indicator.variables.map((variable) => variable.id),
+      variableNames: indicator.variables.slice(0, 4).map((variable) => variable.name),
+      variableIds: indicator.variables.slice(0, 4).map((variable) => variable.id),
     })),
   });
 }
