@@ -6,14 +6,14 @@ const prisma = new PrismaClient();
 
 const DEFAULT_BRANDING = {
   organizationName: "Indicadores App",
-  shortName: "IA",
+  shortName: "SEAPTO",
   appTitle: "Tablero de indicadores",
   appDescription: "Formulario de indicadores organizacionales con Next.js",
-  appEyebrow: "Sistema institucional",
+  appEyebrow: "GanaGana",
   appSummary:
     "Aplicacion para administrar usuarios, indicadores y resultados del tablero de mando.",
   loginBadge: "Acceso al sistema",
-  loginTitle: "App formulario indicadores",
+  loginTitle: "Formulario Indicadores",
   loginDescription:
     "Esta pantalla esta separada del formulario para que el acceso sea mas claro y profesional.",
   loginSupportTitle: "Configuracion visual centralizada",
@@ -38,7 +38,7 @@ const DEFAULT_BRANDING = {
     cardShadow: "0 30px 80px rgba(20, 38, 62, 0.12)",
   },
   assets: {
-    logoText: "IA",
+    logoText: "SEAPTO",
     loginImageUrl: "",
     logoImageUrl: "",
   },

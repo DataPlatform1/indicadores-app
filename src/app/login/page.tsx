@@ -254,7 +254,7 @@ export default function LoginPage() {
           )}
           <p className="brand-kicker mt-5">{branding.appEyebrow}</p>
           <h1 className="brand-title mt-3 text-4xl font-semibold tracking-tight">
-            Formulario Indicadores
+            {branding.loginTitle}
           </h1>
           <p className="brand-copy mt-2 text-sm">
             Usa tu correo y contrasena para acceder.

@@ -232,7 +232,7 @@ export default function DisenoAdminClient() {
             <div className="grid gap-6">
               <SectionTitle
                 title="Identidad institucional"
-                description="Nombre, resumen y textos principales de la aplicacion."
+                description="Nombre institucional, marca y texto superior visible en el login."
               />
               <div className="grid gap-4 md:grid-cols-2">
                 <Field label="Nombre de la organizacion" required>
@@ -250,36 +250,21 @@ export default function DisenoAdminClient() {
                 <Field label="Descripcion general" required>
                   <textarea className="field min-h-24 resize-y" value={form.appDescription} onChange={(event) => updateField("appDescription", event.target.value)} required />
                 </Field>
-                <Field label="Texto corto superior" required>
+                <Field label="Texto superior del login" required>
                   <input className="field" value={form.appEyebrow} onChange={(event) => updateField("appEyebrow", event.target.value)} required />
                 </Field>
               </div>
 
               <SectionTitle
-                title="Textos del login"
-                description="Mensajes que ven los usuarios antes de iniciar sesion."
+                title="Login actual"
+                description="Ahora el login es una tarjeta simple: logo, texto superior, titulo, correo y contrasena."
               />
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label="Badge del login" required>
-                  <input className="field" value={form.loginBadge} onChange={(event) => updateField("loginBadge", event.target.value)} required />
-                </Field>
                 <Field label="Titulo del login" required>
                   <input className="field" value={form.loginTitle} onChange={(event) => updateField("loginTitle", event.target.value)} required />
                 </Field>
-                <Field label="Descripcion del login" required>
-                  <textarea className="field min-h-24 resize-y" value={form.loginDescription} onChange={(event) => updateField("loginDescription", event.target.value)} required />
-                </Field>
-                <Field label="Titulo de apoyo" required>
-                  <input className="field" value={form.loginSupportTitle} onChange={(event) => updateField("loginSupportTitle", event.target.value)} required />
-                </Field>
-                <Field label="Texto de apoyo" required>
-                  <textarea className="field min-h-24 resize-y" value={form.loginSupportText} onChange={(event) => updateField("loginSupportText", event.target.value)} required />
-                </Field>
                 <Field label="Logo en texto" required>
                   <input className="field" value={form.logoText} onChange={(event) => updateField("logoText", event.target.value)} required />
-                </Field>
-                <Field label="URL imagen login">
-                  <input className="field" value={form.loginImageUrl} onChange={(event) => updateField("loginImageUrl", event.target.value)} />
                 </Field>
                 <Field label="URL logo institucional">
                   <input className="field" value={form.logoImageUrl} onChange={(event) => updateField("logoImageUrl", event.target.value)} />
@@ -362,8 +347,8 @@ export default function DisenoAdminClient() {
 
           <section className="brand-panel rounded-[2rem] p-6">
             <SectionTitle
-              title="Vista previa orientativa"
-              description="Te ayuda a entender como impactaran los cambios antes de navegar por toda la app."
+              title="Vista previa del login"
+              description="Muestra la tarjeta simple que vera el usuario al entrar."
             />
 
             {loading ? (
@@ -386,19 +371,16 @@ export default function DisenoAdminClient() {
                     {form.logoText}
                   </div>
                   <p
-                    className="mt-4 inline-flex rounded-full px-4 py-1 text-sm font-semibold"
-                    style={{
-                      background: form.accent,
-                      color: form.accentText,
-                    }}
+                    className="mt-4 text-xs font-bold uppercase tracking-[0.24em]"
+                    style={{ color: form.mutedText }}
                   >
-                    {form.loginBadge}
+                    {form.appEyebrow}
                   </p>
                   <h3 className="mt-4 text-3xl font-semibold" style={{ color: form.text }}>
                     {form.loginTitle}
                   </h3>
                   <p className="mt-3 text-sm leading-6" style={{ color: form.mutedText }}>
-                    {form.loginDescription}
+                    Usa tu correo y contrasena para acceder.
                   </p>
                 </div>
 
