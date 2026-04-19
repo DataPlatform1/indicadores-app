@@ -263,7 +263,7 @@ export default function LoginPage() {
 
         <form className="mt-8 grid gap-4" onSubmit={handleLogin}>
           <label className="grid gap-2 text-sm font-medium text-slate-700">
-            <span>Correo</span>
+            <span>Email</span>
             <input
               className="field"
               type="email"
